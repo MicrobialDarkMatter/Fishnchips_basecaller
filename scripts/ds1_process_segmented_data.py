@@ -29,18 +29,20 @@ def load_file(source_filepath):
 
 def save_file(target_filepath, x, y):
     if os.path.isfile(target_filepath):
+        print('Removing existing target file.')
         os.unlink(target_filepath)
+    print('Saving file.')
     with h5py.File(target_filepath, 'w') as f:
-        f.create_dataset('x', data=x)
-        f.create_dataset('y', data=y)
+        f.create_dataset('x', data=x, dtype=np.int16)
+        f.create_dataset('y', data=y, dtype=np.int8)
 
 def alter_labels(y):
-    y_fnc = np.zeros(shape=(y.shape[0], y.shape[1]+2)) #+ space for start and end tokens
-       
+    y_fnc = np.zeros(shape=(y.shape[0], y.shape[1]+2), dtype=np.int8) #+ space for start and end tokens    
     for i, y_row in enumerate(y):
-        print(f'Processing: {i+1}/{y.shape[0]}', end='\r')
+        print(f'Processing: {i+1}/{y.shape[0]} ({round((i+1)/y.shape[0]*100,1)}%)', end='\r')
+        y_row[-1] = -1
         y_fnc_row = np.vectorize(lambda x: x+1)(y_row)
-        y_fnc_row = np.append(y_row, [PADDING_TOKEN])
+        y_fnc_row = np.append(y_fnc_row, [PADDING_TOKEN])
         y_fnc_row = np.insert(y_fnc_row, 0, START_TOKEN, axis=0)
         y_fnc_row[np.argmax(y_fnc_row==0)] = END_TOKEN
         y_fnc[i] = y_fnc_row
@@ -49,8 +51,8 @@ def alter_labels(y):
 
 def verify_labels(y, y_fnc):
     assert y_fnc.shape == (y.shape[0], y.shape[1]+2)
-    assert sum(y_fnc[0]) == sum(y[0]) + START_TOKEN + END_TOKEN
-    assert sum(y_fnc[-1]) == sum(y[-1]) + START_TOKEN + END_TOKEN
+    assert sum(y_fnc[0]) == sum(y[0]) + len(y[0]) + START_TOKEN + END_TOKEN
+    assert sum(y_fnc[-1]) == sum(y[-1]) + len(y[-1]) + START_TOKEN + END_TOKEN
 
 def main(source_filepath, target_filepath):
     x,y = load_file(source_filepath)
