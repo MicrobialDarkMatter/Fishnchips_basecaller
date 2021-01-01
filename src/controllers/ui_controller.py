@@ -19,7 +19,7 @@ class UI_Controller():
         choices = ['retrain', 'skip training']
         question = inquirer.List('retrain', message, choices)
         answer = inquirer.prompt([question])
-        self.retrain = answer['retrain'] == 'retrian'
+        self.retrain = answer['retrain'] == 'retrain'
 
     def ask_retest(self):
         if os.path.exists(f'{self.path}/evaluation.json') == False:

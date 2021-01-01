@@ -12,7 +12,7 @@
         "maxpool_kernel": 4
     },
     "training":{
-        "data":"./data/ds1_labelled_segmented_fnch/train.hdf5",
+        "data":"./data/segmented/train.hdf5",
         "epochs": 3,
         "warmup":100, 
         "patience": 300,
@@ -20,12 +20,12 @@
         "lr_mult": 1
     },
     "validation":{
-        "data":"./data/ds1_labelled_segmented_fnch/validate.hdf5",
+        "data":"./data/segmented/validate.hdf5",
         "batch_size":32,
         "algorithm": "editdistance"
     },
     "testing":{
-        "data":"./data/ds1_labelled_segmented_fnch",
+        "data":"./data/segmented",
         "batch_size":300
     }
 }

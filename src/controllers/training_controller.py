@@ -58,8 +58,6 @@ class Training_Controller():
             self.train_accuracy.reset_states()
 
             for batch,(x,y) in enumerate(training_dataset):
-                if batch == 2:
-                    break # TODO: Remove this
                 x = tf.constant(x, dtype=tf.float32)
                 y = tf.constant(y, dtype=tf.int32)
                 self.train_step(x, y)
