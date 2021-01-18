@@ -1,6 +1,6 @@
 .DS_Store
 __pycache__
 data
-temp
+temps
 trained_models
 scripts
