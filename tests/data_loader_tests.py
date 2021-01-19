@@ -9,7 +9,7 @@ from tests.utils.printer import print_test_result
 
 def test_read_id_list_length(data_filepath):
     test_name = test_read_id_list_length.__name__
-    expected = 943
+    expected = 5
     
     loader = DataLoader(data_filepath)
     reads = loader.load_read_ids()
@@ -18,12 +18,12 @@ def test_read_id_list_length(data_filepath):
     result = AssertThat(actual, expected).are_equal()
     print_test_result(result, test_name, expected, actual)
 
-def test_read_id_list_element(data_filepath):
-    test_name = test_read_id_list_length.__name__
-    expected = '002f0f2d-ffc1-4072-82d3-6ce425d9724e'
+def test_read_id_length(data_filepath):
+    test_name = test_read_id_length.__name__
+    expected = len('002f0f2d-ffc1-4072-82d3-6ce425d9724e')
     
     loader = DataLoader(data_filepath)
-    actual = loader.load_read_ids()[0]
+    actual = len(loader.load_read_ids()[0])
 
     result = AssertThat(actual, expected).are_equal()
     print_test_result(result, test_name, expected, actual)
@@ -54,7 +54,7 @@ def test_read_dacs_is_normilized(data_filepath):
 def run_tests():
     data_filepath = './tests/data.hdf5'
     test_read_id_list_length(data_filepath)
-    test_read_id_list_element(data_filepath)
+    test_read_id_length(data_filepath)
     test_read_dacs_list_elemnt(data_filepath)
     test_read_dacs_is_normilized(data_filepath)
 
