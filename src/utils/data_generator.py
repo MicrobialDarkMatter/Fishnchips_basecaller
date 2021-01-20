@@ -20,6 +20,13 @@ class DataGenerator():
             y = self.convert_to_target_language(y_raw)
             yield (x,y)
 
+    def get_batched_read(self):
+        while True:
+            self.batch_count += 1
+            x, y_raw, ref, dacs, read_id = self.data_buffer.get_batched_read()
+            y = self.convert_to_target_language(y_raw)
+            yield x, y, ref, dacs, read_id
+
     def convert_to_target_language(self, y_raw):
         y = []
         start_token = 5

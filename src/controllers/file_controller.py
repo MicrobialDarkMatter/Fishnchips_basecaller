@@ -1,6 +1,6 @@
 import os
 
-class File_Controller():
+class FileController():
     def __init__(self, experiment_name):
         self.path = f'./trained_models/{experiment_name}'
     

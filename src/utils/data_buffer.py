@@ -4,9 +4,8 @@ from collections import deque
 from src.utils.data_loader import DataLoader
 
 class DataBuffer():
-    def __init__(self, data_filepath, buffer_size, batch_size, signal_window_size, signal_window_stride, min_labels_per_window=1):
-        self.data_loader = DataLoader(data_filepath)
-        self.set_read_ids()      
+    def __init__(self, data_loader, buffer_size, batch_size, signal_window_size, signal_window_stride, min_labels_per_window=1):
+        self.data_loader = data_loader
         self.position = 0
         self.size = buffer_size
         self.batch_size = batch_size
@@ -15,6 +14,7 @@ class DataBuffer():
         self.min_label_window_size = min_labels_per_window
         self.signal_windows = []
         self.label_windows = []
+        self.set_read_ids()      
 
     def set_read_ids(self):
         read_ids = self.data_loader.load_read_ids()
@@ -31,6 +31,13 @@ class DataBuffer():
         self.drop()
         return x,y
 
+    def get_batched_read(self):
+        read_id = self.read_ids[self.position]
+        dacs, ref, _ = self.data_loader.load_read(read_id)
+        read_x, read_y = self.get_segmented_read(read_id)
+        self.position += 1
+        return np.array(read_x), np.array(read_y), list(ref), dacs, read_id
+        
     def fetch(self):        
         skips, found = 0, 0
         while found < self.size:

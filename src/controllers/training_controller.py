@@ -9,9 +9,12 @@ from src.controllers.data_controller import DataController
 from src.controllers.validation_controller import ValidationController
 from src.model.Attention.CustomSchedule import CustomSchedule
 from src.model.Attention.attention_utils import create_combined_mask
+from src.utils.data_generator import DataGenerator
+from src.utils.data_buffer import DataBuffer
+from src.utils.data_loader import DataLoader
 
-class Training_Controller():
-    def __init__(self, config, experiment_name, model, retrain=True):
+class TrainingController():
+    def __init__(self, config, experiment_name, model, generator, validation_controller):
         training_config = config['training']
         model_config = config['model']
         
@@ -25,13 +28,16 @@ class Training_Controller():
         self.model_path = f'./trained_models/{experiment_name}/model.h5'
         self.training_path = f'./trained_models/{experiment_name}/training.npy'
 
+        loader = DataLoader(training_config['data'])
+        buffer = DataBuffer(loader, buffer_size=5, batch_size=self.batch_size, signal_window_size=model_config['signal_window_size'], )
+        self.generator = DataGenerator()
+
         learning_rate = CustomSchedule(model_config['d_model']*training_config['lr_mult'])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none') 
 
-        self.data_controller = DataController(training_config['data'], self.batch_size)
         self.validation_controller = ValidationController(config['validation'])
 
     def load_model(self):

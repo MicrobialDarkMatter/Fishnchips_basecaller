@@ -3,7 +3,7 @@ import sys
 import json
 import inquirer
 
-class UI_Controller():
+class UIController():
     def __init__(self, config, experiment_name):
         self.config = config
         self.path = f'./trained_models/{experiment_name}'

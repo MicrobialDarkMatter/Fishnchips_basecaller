@@ -2,7 +2,7 @@ import tensorflow as tf
 from src.model.Attention.attention_utils import create_combined_mask
 from src.model.FishNChips import FishNChips
 
-class Model_Controller():
+class ModelController():
     def __init__(self, config):
         self.model_config = config['model']
 
