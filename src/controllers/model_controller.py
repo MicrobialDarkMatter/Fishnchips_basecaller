@@ -2,7 +2,7 @@ import tensorflow as tf
 from src.model.Attention.attention_utils import create_combined_mask
 from src.model.FishNChips import FishNChips
 
-class Model_Controller():
+class ModelController():
     def __init__(self, config):
         self.model_config = config['model']
 
@@ -17,8 +17,8 @@ class Model_Controller():
             output_dim=1 + 4 + 1 + 1, # PAD + ATCG + START + STOP
             num_heads=self.model_config['num_heads'],
             dff=self.model_config['dff'], 
-            pe_encoder_max_length=self.model_config['encoder_max_length'], 
-            pe_decoder_max_length=self.model_config['decoder_max_length'], 
+            pe_encoder_max_length=self.model_config['signal_window_size'], 
+            pe_decoder_max_length=self.model_config['label_window_size'], 
             rate=self.model_config['dropout_rate'])
         
         inp = tf.random.uniform((model.pe_encoder_max_length, 1)) 

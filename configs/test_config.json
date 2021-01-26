@@ -1,0 +1,38 @@
+{
+    "model":{
+        "signal_window_size": 300,
+        "label_window_size": 100,
+        "attention_blocks": 4,
+        "cnn_blocks": 5,
+        "maxpool_idx": 3,
+        "d_model": 250,
+        "dff": 512,
+        "num_heads": 25,
+        "dropout_rate": 0.1,
+        "maxpool_kernel": 4
+    },
+    "training":{
+        "data":"./data/test_data.hdf5",
+        "epochs": 3,
+        "warmup":100, 
+        "patience": 300,
+        "batches":1000,
+        "batch_size":300,
+        "buffer_size":5,
+        "lr_mult": 1,
+        "signal_window_stride":100
+    },
+    "validation":{
+        "data":"./data/test_data.hdf5",
+        "batch_size":32,
+        "buffer_size":5,
+        "reads":3,
+        "signal_window_stride":300
+    },
+    "testing":{
+        "data":"./data/test_data.hdf5",
+        "batch_size":300,
+        "buffer_size":5,
+        "signal_window_stride":300
+    }
+}

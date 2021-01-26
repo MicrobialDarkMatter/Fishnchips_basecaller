@@ -1,6 +1,6 @@
 import os
 
-class File_Controller():
+class FileController():
     def __init__(self, experiment_name):
         self.path = f'./trained_models/{experiment_name}'
     
@@ -12,3 +12,9 @@ class File_Controller():
         except Exception as e:
             print(e)
             print(f' ! Error occured when creating experiment run directory. Path: {path}')
+
+    def get_model_filepath(self):
+        return f'{self.path}/model.h5'
+    
+    def get_training_filepath(self):
+        return f'{self.path}/training.npy'
