@@ -61,7 +61,7 @@ def test_buffer_get_batched_read_x_shape(data_loader):
     print_test_result(result1, f'{test_name}_c', 1, actual[2])
 
 def run_tests():
-    data_loader = DataLoader('./tests/test_data.hdf5')
+    data_loader = DataLoader('./data/test_data.hdf5')
     test_buffer_get_batch_x_shape(data_loader)
     test_buffer_get_batch_y_shape(data_loader)
     test_buffer_get_batched_read_x_shape(data_loader)

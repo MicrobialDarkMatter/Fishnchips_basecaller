@@ -35,6 +35,8 @@ def get_user_input(ui_controller):
     return ui_controller.retrain, ui_controller.retest
 
 def main(config_path, experiment_name):
+    
+    # TODO: Load model vs retrain
     config = load_config(config_path)
     ui_controller = UI_Controller(config, experiment_name)
     io_controller = File_Controller(experiment_name)
@@ -47,6 +49,7 @@ def main(config_path, experiment_name):
     training_controller = Training_Controller(config, experiment_name, model, retrain)
     training_controller.train()
 
+    
 
 if __name__ == "__main__":
     args = parse_args()

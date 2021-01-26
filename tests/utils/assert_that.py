@@ -11,3 +11,6 @@ class AssertThat():
 
     def is_in_interval(self, a, b):
         return a < self.x < b
+
+    def is_instance_of(self, a):
+        return isinstance(self.x, a)

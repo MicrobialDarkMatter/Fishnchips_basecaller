@@ -6,30 +6,21 @@ import math
 
 from src.controllers.data_controller import DataController
 from src.controllers.inference_controller import InferenceController
-from src.utils.validation_algorithm import VALIDATION_ALGORITHM
 
 class ValidationController():
-    def __init__(self, validation_config, generator):
+    def __init__(self, config, generator):
+        validation_config = config['validation']
         self.batch_size = validation_config['batch_size']
-        self.algorithm = validation_config['algorithm']
         self.reads = validation_config['reads']
         self.generator = generator
         self.inference_controller = InferenceController()
 
     def validate(self, model):
-        if self.algorithm == VALIDATION_ALGORITHM.editdistance:
-            return self.validate_editdistance(model)
-        if self.algorithm == VALIDATION_ALGORITHM.mappy:
-            return self.validate_mappy(model)
-        raise f' ! Unknown validation algorithm. Valid options are: {VALIDATION_ALGORITHM.get_options()}'
-
-    def validate_editdistance(self, model):
         validation_loss = 0
         performed = 0
         start_time = time.time()
 
         print(' - Starting edit distance validation.')
-
         for r in range(self.reads):
             print(f' - - validating read {r+1}/{self.reads}', end='\r')
             try:
@@ -54,6 +45,3 @@ class ValidationController():
         print()
         print(f' - - Batch:{batch+1}/{batches} | Validation loss:{validation_loss} | Current average edit distance:{average_editdistance}.', end="\r")
         return validation_loss / performed if performed > 0 else 0
-
-    def validate_mappy(self, model):
-        raise 'Not implemented.'

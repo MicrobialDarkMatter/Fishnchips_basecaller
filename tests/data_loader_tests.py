@@ -52,7 +52,7 @@ def test_loader_read_dacs_is_normilized(data_filepath):
     print_test_result(result, test_name, "std of signal to be < 1.3 and > 0.7.", actual)
 
 def run_tests():
-    data_filepath = './tests/test_data.hdf5'
+    data_filepath = './data/test_data.hdf5'
     test_loader_read_id_list_length(data_filepath)
     test_loader_read_id_length(data_filepath)
     test_loader_read_dacs_list_elemnt(data_filepath)

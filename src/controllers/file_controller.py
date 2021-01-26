@@ -12,3 +12,9 @@ class FileController():
         except Exception as e:
             print(e)
             print(f' ! Error occured when creating experiment run directory. Path: {path}')
+
+    def get_model_filepath(self):
+        return f'{self.path}/model.h5'
+    
+    def get_training_filepath(self):
+        return f'{self.path}/training.npy'

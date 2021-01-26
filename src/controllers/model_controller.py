@@ -17,8 +17,8 @@ class ModelController():
             output_dim=1 + 4 + 1 + 1, # PAD + ATCG + START + STOP
             num_heads=self.model_config['num_heads'],
             dff=self.model_config['dff'], 
-            pe_encoder_max_length=self.model_config['encoder_max_length'], 
-            pe_decoder_max_length=self.model_config['decoder_max_length'], 
+            pe_encoder_max_length=self.model_config['signal_window_size'], 
+            pe_decoder_max_length=self.model_config['label_window_size'], 
             rate=self.model_config['dropout_rate'])
         
         inp = tf.random.uniform((model.pe_encoder_max_length, 1)) 

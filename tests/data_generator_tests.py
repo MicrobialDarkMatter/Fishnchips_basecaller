@@ -87,7 +87,7 @@ def run_tests():
     signal_window_size = 300
     signal_window_stride = 30
     min_labels_per_window = 1
-    loader = DataLoader('./tests/test_data.hdf5')
+    loader = DataLoader('./data/test_data.hdf5')
     buffer = DataBuffer(loader, buffer_size, batch_size, signal_window_size, signal_window_stride)
 
     test_generator_get_batch_x_shape(buffer)

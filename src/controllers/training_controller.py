@@ -18,51 +18,38 @@ class TrainingController():
         training_config = config['training']
         model_config = config['model']
         
-        self.epochs = training_config['epochs']
-        self.patience = training_config['patience']
-        self.warmup = training_config['warmup']
-        self.batch_size = training_config['batch_size']
-        self.model = model
-        self.retrain = retrain
-        
+        self.generator = generator
+        self.validation_controller = validation_controller
         self.model_path = f'./trained_models/{experiment_name}/model.h5'
         self.training_path = f'./trained_models/{experiment_name}/training.npy'
 
-        loader = DataLoader(training_config['data'])
-        buffer = DataBuffer(loader, buffer_size=5, batch_size=self.batch_size, signal_window_size=model_config['signal_window_size'], )
-        self.generator = DataGenerator()
-
+        self.epochs = training_config['epochs']
+        self.patience = training_config['patience']
+        self.warmup = training_config['warmup']
+        self.batches = training_config['batches']
+        self.batch_size = training_config['batch_size']
+        self.model = model
+        
         learning_rate = CustomSchedule(model_config['d_model']*training_config['lr_mult'])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none') 
 
-        self.validation_controller = ValidationController(config['validation'])
-
-    def load_model(self):
-        print(' - Skipping training and loading a trained model from a file.')
-        self.model.load_weights(self.model_path)
-        return self.model
-
     def train(self):
-        if self.retrain == False:
-            return self.load_model()
-
         print(' - Training model.')
-        accuracies = []
+        waited = 0
         old_validation_loss= 1e10
         model_weights = None
+        accuracies = []
 
-        x, y = self.data_controller.load_data()
-        batches = math.ceil(x.shape[0] / self.batch_size)
-        training_dataset = self.data_controller.process_data(x, y)
-        print(' - - Starting...')
         for epoch in range(self.epochs):
+            waited = 0 if epoch < self.warmup
             start_time = time.time()
             self.train_loss.reset_states()
             self.train_accuracy.reset_states()
 
+            batches = next(self.generator.get_batches(self.batches))
             for batch,(x,y) in enumerate(training_dataset):
                 x = tf.constant(x, dtype=tf.float32)
                 y = tf.constant(y, dtype=tf.int32)
@@ -76,12 +63,17 @@ class TrainingController():
             print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{validation_loss} | Took:{time.time() - start_time} secs')
 
             if validation_loss < old_validation_loss:
-                # TODO: Add waiting
+                waited = 0
                 old_validation_loss = validation_loss
                 print(' - - Model validation accuracy improvement - saving model weights.')
                 self.model.save_weights(self.model_path)
                 model_weights = self.model.get_weights()
- 
+            else:
+                waited += 1
+                if waited > self.patience:
+                    print(f' - Stopping training ( out of patience - model has not improved for {self.patience} epochs.')
+                    break
+            
         self.model.set_weights(model_weights)
         return self.model
     

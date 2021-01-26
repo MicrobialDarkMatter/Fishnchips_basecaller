@@ -12,25 +12,25 @@
         "maxpool_kernel": 4
     },
     "training":{
-        "data":"./tests/test_data.hdf5",
+        "data":"./data/test_data.hdf5",
         "epochs": 3,
         "warmup":100, 
         "patience": 300,
+        "batches":1000,
         "batch_size":300,
         "buffer_size":5,
         "lr_mult": 1,
         "signal_window_stride":100
     },
     "validation":{
-        "data":"./tests/test_data.hdf5",
+        "data":"./data/test_data.hdf5",
         "batch_size":32,
-        "algorithm": "editdistance",
         "buffer_size":5,
         "reads":3,
         "signal_window_stride":300
     },
     "testing":{
-        "data":"./tests/test_data.hdf5",
+        "data":"./data/test_data.hdf5",
         "batch_size":300,
         "buffer_size":5,
         "signal_window_stride":300

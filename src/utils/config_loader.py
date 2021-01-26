@@ -1,6 +1,5 @@
 import os
 import json
-from src.utils.validation_algorithm import VALIDATION_ALGORITHM
 
 def load_config(path):
     with open(path, 'r') as f:
@@ -32,16 +31,15 @@ def verify_train_config(train_config, model_config):
     assert type(train_config['epochs']) == int and train_config['epochs'] > 0, 'Number of training epochs must be a positive integer.'
     assert type(train_config['warmup']) == int and train_config['warmup'] >= 0, 'Number of warmup epochs must be a positive integer.'
     assert type(train_config['patience']) == int and train_config['patience'] >= 0, 'Training patience (the number of epochs to wait for accuracy improvement) must be a positive integer.'
+    assert type(train_config['batches']) == int and train_config['batches'] > 0, 'Number of training batches of an epoch must be a positive integer.'
     assert type(train_config['batch_size']) == int and train_config['batch_size'] > 0, 'Training batch size must be a positive integer.'
     assert type(train_config['buffer_size']) == int and train_config['buffer_size'] > 0, 'Training buffer size must be a positive integer.'
     assert type(train_config['lr_mult']) == int or type(train_config['lr_mult']) == float, 'Learning rate multiplier must be an int or a foat.'
     assert type(train_config['signal_window_stride']) == int and train_config['signal_window_stride'] > 0 and train_config['signal_window_stride'] <= model_config['signal_window_size'], 'Training signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
 
-
 def vefify_validation_config(validation_config, model_config):
     assert os.path.exists(validation_config['data']), 'Invalid validation data directory.'
     assert type(validation_config['batch_size']) == int and validation_config['batch_size'] >= 0, 'Validation batch size must be a positive integer.'
-    assert validation_config['algorithm'] in VALIDATION_ALGORITHM.get_options(), f'Validation algorith options are {VALIDATION_ALGORITHM.get_options()}'
     assert type(validation_config['buffer_size']) == int and validation_config['buffer_size'] > 0, 'Validation buffer size must be a positive integer.'
     assert type(validation_config['reads']) == int and validation_config['reads'] >= 0, 'Number of reads to validate must be a non-negative integer.'
     assert type(validation_config['signal_window_stride']) == int and validation_config['signal_window_stride'] > 0 and validation_config['signal_window_stride'] <= model_config['signal_window_size'], 'Validation signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
