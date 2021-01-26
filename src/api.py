@@ -33,14 +33,15 @@ def get_trained_model(config, experiment_name):
     trained_model = model.load_weights(trained_model_path)
     return model
 
+def setup_experiment(experiment_name):
+    file_controller = FileController(experiment_name)
+    file_controller.create_experiment_dir()
+
 def get_validation_controller(config):
     generator = get_generator(config, key='validation')
     return ValidationController(config, generator)
 
 def get_training_controller(config, experiment_name):
-    file_controller = FileController(experiment_name)
-    file_controller.create_experiment_dir()
-
     validation_controller = get_validation_controller(config)
     model = get_model(config)
     generator = get_generator(config, key='training')
