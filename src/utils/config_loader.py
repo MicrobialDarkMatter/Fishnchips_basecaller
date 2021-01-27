@@ -38,14 +38,16 @@ def verify_train_config(train_config, model_config):
     assert type(train_config['signal_window_stride']) == int and train_config['signal_window_stride'] > 0 and train_config['signal_window_stride'] <= model_config['signal_window_size'], 'Training signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
 
 def vefify_validation_config(validation_config, model_config):
-    assert os.path.exists(validation_config['data']), 'Invalid validation data directory.'
+    assert os.path.exists(validation_config['data']), 'Invalid validation data path.'
     assert type(validation_config['batch_size']) == int and validation_config['batch_size'] >= 0, 'Validation batch size must be a positive integer.'
     assert type(validation_config['buffer_size']) == int and validation_config['buffer_size'] > 0, 'Validation buffer size must be a positive integer.'
-    assert type(validation_config['reads']) == int and validation_config['reads'] >= 0, 'Number of reads to validate must be a non-negative integer.'
+    assert type(validation_config['reads']) == int and validation_config['reads'] > 0, 'Number of reads to validate must be a positive integer.'
     assert type(validation_config['signal_window_stride']) == int and validation_config['signal_window_stride'] > 0 and validation_config['signal_window_stride'] <= model_config['signal_window_size'], 'Validation signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
 
 def verify_test_config(test_config, model_config):
     assert os.path.exists(test_config['data']), 'Invalid test data directory.'
+    assert os.path.exists(test_config['reference']), 'Invalid test reference filepath.'
     assert type(test_config['batch_size']) == int and test_config['batch_size'] >= 0, 'Test batch size must be a positive integer.'
     assert type(test_config['buffer_size']) == int and test_config['buffer_size'] > 0, 'Test buffer size must be a positive integer.'
     assert type(test_config['signal_window_stride']) == int and test_config['signal_window_stride'] > 0 and test_config['signal_window_stride'] <= model_config['signal_window_size'], 'Test signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
+    assert type(test_config['reads']) == int and test_config['reads'] > 0, 'Number of reads to test must be a positive integer.'

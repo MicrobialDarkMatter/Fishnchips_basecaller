@@ -2,31 +2,32 @@ import os
 import sys
 import json
 import inquirer
+from src.controllers.file_controller import FileController
 
 class UIController():
     def __init__(self, config, experiment_name):
         self.config = config
-        self.path = f'./trained_models/{experiment_name}'
+        self.file_controller = FileController(experiment_name)
         self.retrain = True
         self.retest = True
         self.append_test = False
         
     def ask_retrain(self):
-        if os.path.exists(f'{self.path}/model.h5') == False:
+        if self.file_controller.trained_model_exists() == False:
             print(' - Model will be trained as a trained model was not found.')
             return
         message = 'A trained model already exists, would you like to retrain it?'
-        choices = ['retrain', 'skip training']
+        choices = ['skip training', 'retrain']
         question = inquirer.List('retrain', message, choices)
         answer = inquirer.prompt([question])
         self.retrain = answer['retrain'] == 'retrain'
 
     def ask_retest(self):
-        if os.path.exists(f'{self.path}/evaluation.json') == False:
+        if self.file_controller.evaluation_exists() == False:
             print(' - Model will be tested as its evaluation was not found.')
             return
-        message = 'A trained model already exists, would you like to retrain it?'
-        choices = ['re-evaluate', 'append to existing', 'skip evaluation']
+        message = 'Model evaluation already exists, what would you like to do?'
+        choices = ['skip evaluation', 're-evaluate', 'append to existing']
         question = inquirer.List('retest', message, choices)
         answer = inquirer.prompt([question])
         self.retest = answer['retest'] in ['re-evaluate', 'append to existing']
