@@ -30,7 +30,7 @@ class FileController():
             return json.load(f)
 
     def save_evaluation(self, evaluation):
-        with open(self.get_evaluation_filepath, 'w') as f:
+        with open(self.get_evaluation_filepath(), 'w') as f:
             json.dump(evaluation, f, indent=4)
 
     def get_model_filepath(self):
