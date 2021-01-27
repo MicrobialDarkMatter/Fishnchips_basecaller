@@ -10,7 +10,7 @@ From: ubuntu:18.04
 %post
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
     apt-get -qq -y update
-    apt-get -y install python3 > /dev/null
+    apt-get -y install python3.7.9
     apt-get -y install python3-pip
     apt-get -y install zlib1g-dev
 
@@ -20,6 +20,7 @@ From: ubuntu:18.04
     pip3 install inquirer
     pip3 install h5py
     pip3 install tensorflow-gpu
+    pip install gast
 
 %runscript
     cd ~/FishNChips_g2
