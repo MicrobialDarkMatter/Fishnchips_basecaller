@@ -4,7 +4,6 @@ import mappy as mp
 import time
 import math
 
-from src.controllers.data_controller import DataController
 from src.controllers.inference_controller import InferenceController
 
 class ValidationController():
@@ -30,7 +29,7 @@ class ValidationController():
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                    y_batch_pred = self.inference_controller.predict_batch(x, model)
+                    y_batch_pred = self.inference_controller.predict_batch(x_batch, model)
                     y_pred.extend(y_batch_pred)
 
                 total_editdistance = 0

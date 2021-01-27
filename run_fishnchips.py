@@ -7,7 +7,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.utils.config_loader import load_config
 from src.controllers.ui_controller import UIController
-from src.api import get_model, get_trained_model, setup_experiment, get_training_controller
+from src.api import get_model, get_trained_model, setup_experiment, get_training_controller, get_testing_controller
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -30,7 +30,7 @@ def get_user_input(ui_controller):
     ui_controller.ask_parameters()
     ui_controller.ask_retrain()
     ui_controller.ask_retest()
-    return ui_controller.retrain, ui_controller.retest
+    return ui_controller.retrain, ui_controller.retest, ui_controller.append_test
 
 def main(config_path, experiment_name):
     
@@ -38,20 +38,24 @@ def main(config_path, experiment_name):
     setup_experiment(experiment_name)
 
     ui_controller = UIController(config, experiment_name)
-    retrain, retest = get_user_input(ui_controller)
-
-    # TODO: Load model vs retrain
+    retrain, retest, append_test = get_user_input(ui_controller)
+    
+    # TODO: Skip training, Start training, Continue training
     if retrain: 
         model = get_model(config)
         training_controller = get_training_controller(config, experiment_name, model)
         training_controller.train()
-
+    else: 
+        model = get_trained_model(config, experiment_name)
+    
     if retest:
-        pass
+        testing_controller = get_testing_controller(config, experiment_name, model, append_test)
+        testing_controller.test()
 
 if __name__ == "__main__":
     args = parse_args()
     main(args.config, args.name)
+    print(' - Script has finished successfully.')
     
     
      
