@@ -1,8 +1,9 @@
 import numpy as np
 
 class DataGenerator():
-    def __init__(self, data_buffer):
+    def __init__(self, data_buffer, label_window_size):
         self.data_buffer = data_buffer
+        self.label_window_size = label_window_size
         self.batch_count = 0
 
     def get_batches(self, amount):
@@ -35,6 +36,8 @@ class DataGenerator():
             y_window = [b+1 for b in y_window] 
             y_window.insert(0, start_token)
             y_window.append(end_token)
+            padding_len = self.label_window_size - len(y_window)
+            y_window.extend([0]*padding_len)
             y.append(y_window)
         return np.array(y)
 

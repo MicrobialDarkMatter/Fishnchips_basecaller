@@ -16,7 +16,7 @@
         "epochs": 3,
         "warmup":100, 
         "patience": 300,
-        "batches":1000,
+        "batches":1,
         "batch_size":300,
         "buffer_size":5,
         "lr_mult": 1,
@@ -26,7 +26,7 @@
         "data":"./data/test_data.hdf5",
         "batch_size":32,
         "buffer_size":5,
-        "reads":3,
+        "reads":1,
         "signal_window_stride":300
     },
     "testing":{

@@ -44,17 +44,17 @@ class TrainingController():
         accuracies = []
 
         for epoch in range(self.epochs):
-            waited = 0 if epoch < self.warmup
+            waited = 0 if epoch < self.warmup else waited
             start_time = time.time()
             self.train_loss.reset_states()
             self.train_accuracy.reset_states()
 
             batches = next(self.generator.get_batches(self.batches))
-            for batch,(x,y) in enumerate(training_dataset):
+            for batch,(x,y) in enumerate(batches):
                 x = tf.constant(x, dtype=tf.float32)
                 y = tf.constant(y, dtype=tf.int32)
                 self.train_step(x, y)
-                print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{batches} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
+                print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
             print()
 
             validation_loss = self.validation_controller.validate(self.model)

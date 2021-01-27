@@ -6,10 +6,8 @@ tf.get_logger().setLevel('ERROR')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.utils.config_loader import load_config
-from src.controllers.ui_controller import UI_Controller
-from src.controllers.file_controller import File_Controller
-from src.controllers.model_controller import Model_Controller
-from src.controllers.training_controller import Training_Controller
+from src.controllers.ui_controller import UIController
+from src.api import get_model, get_trained_model, setup_experiment, get_training_controller
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -36,20 +34,20 @@ def get_user_input(ui_controller):
 
 def main(config_path, experiment_name):
     
-    # TODO: Load model vs retrain
     config = load_config(config_path)
-    ui_controller = UI_Controller(config, experiment_name)
-    io_controller = File_Controller(experiment_name)
-    model_controller = Model_Controller(config)
+    setup_experiment(experiment_name)
 
+    ui_controller = UIController(config, experiment_name)
     retrain, retest = get_user_input(ui_controller)
-    io_controller.create_experiment_dir()  
-    model = model_controller.initialize_model()
 
-    training_controller = Training_Controller(config, experiment_name, model, retrain)
-    training_controller.train()
+    # TODO: Load model vs retrain
+    if retrain: 
+        model = get_model(config)
+        training_controller = get_training_controller(config, experiment_name, model)
+        training_controller.train()
 
-    
+    if retest:
+        pass
 
 if __name__ == "__main__":
     args = parse_args()

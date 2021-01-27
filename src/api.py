@@ -20,7 +20,8 @@ def get_buffer(config, key='training'):
 
 def get_generator(config, key='training'):
     buffer = get_buffer(config, key)
-    return DataGenerator(buffer)
+    label_window_size = config['model']['label_window_size']
+    return DataGenerator(buffer, label_window_size)
 
 def get_model(config):
     model_controller = ModelController(config)
@@ -41,11 +42,10 @@ def get_validation_controller(config):
     generator = get_generator(config, key='validation')
     return ValidationController(config, generator)
 
-def get_training_controller(config, experiment_name):
+def get_training_controller(config, experiment_name, model):
     validation_controller = get_validation_controller(config)
-    model = get_model(config)
     generator = get_generator(config, key='training')
-    return Training_Controller(config, experiment_name, model, generator, validation_controller)
+    return TrainingController(config, experiment_name, model, generator, validation_controller)
 
 
 
