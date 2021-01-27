@@ -43,7 +43,7 @@ class FileController():
         return f'{self.path}/evaluation.json'
 
     def get_assembly_filepath(self, read_id, iteration):
-        return f'{self.path}/assemblies/read_{iteration}_id_{read_id}' 
+        return f'{self.path}/assemblies/read_{iteration}_id_{read_id}.txt' 
 
     def trained_model_exists(self):
         return os.path.exists(self.get_model_filepath())

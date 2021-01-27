@@ -43,18 +43,18 @@ class TestingController():
 
     def get_result(self, assembly, read_id):
         try:
-            besthit = next(self._aligner.map(assembly))
+            besthit = next(self.aligner.map(assembly))
             return self.get_result_dict(read_id, besthit.ctg, besthit.r_st, besthit.r_en, besthit.NM, besthit.blen, besthit.cig, besthit.cigacc)
         except:
             return self.get_result_dict(read_id, 0, 0, 0, 0, 0, 0, 0)
 
-    def get_result_dict(self, read_id, ctg, r_st, r_en, NM, blen, cig, cigacc):
+    def get_result_dict(self, read_id, ctg, r_st, r_en, nm, blen, cig, cigacc):
         return {
             'read_id':read_id,
             'ctg': ctg,
             'r_st': r_st,
             'r_en': r_en,
-            'NM': NN,
+            'NM': nm,
             'blen': blen,
             'cig': cig,
             'cigacc': cigacc

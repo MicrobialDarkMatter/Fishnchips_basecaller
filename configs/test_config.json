@@ -31,7 +31,7 @@
     },
     "testing":{
         "data":"./data/raw_test_reads",
-        "batch_size":300,
+        "batch_size":30,
         "buffer_size":5,
         "signal_window_stride":30,
         "reads":1,

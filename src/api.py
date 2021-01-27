@@ -50,6 +50,7 @@ def get_trained_model(config, experiment_name):
 def setup_experiment(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.create_experiment_dir()
+    file_controller.create_assembly_directory()
 
 def get_validation_controller(config):
     generator = get_generator(config, key='validation')
