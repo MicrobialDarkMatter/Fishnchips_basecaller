@@ -5,7 +5,6 @@ import math
 import sys
 import os
 
-from src.controllers.data_controller import DataController
 from src.controllers.validation_controller import ValidationController
 from src.model.Attention.CustomSchedule import CustomSchedule
 from src.model.Attention.attention_utils import create_combined_mask
@@ -20,8 +19,10 @@ class TrainingController():
         
         self.generator = generator
         self.validation_controller = validation_controller
-        self.model_path = f'./trained_models/{experiment_name}/model.h5'
-        self.training_path = f'./trained_models/{experiment_name}/training.npy'
+        
+        file_controller = FileController(experiment_name)
+        self.model_path = file_controller.get_model_filepath()
+        self.training_path = file_controller.get_training_filepath()
 
         self.epochs = training_config['epochs']
         self.patience = training_config['patience']

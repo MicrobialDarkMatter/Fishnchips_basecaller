@@ -4,7 +4,6 @@ class DataGenerator():
     def __init__(self, data_buffer, label_window_size):
         self.data_buffer = data_buffer
         self.label_window_size = label_window_size
-        self.batch_count = 0
 
     def get_batches(self, amount):
         while True:
@@ -16,14 +15,12 @@ class DataGenerator():
         
     def get_batch(self):
         while True:
-            self.batch_count += 1
             x, y_raw = self.data_buffer.get_batch()
             y = self.convert_to_target_language(y_raw)
             yield (x,y)
 
     def get_batched_read(self):
         while True:
-            self.batch_count += 1
             x, y_raw, ref, dacs, read_id = self.data_buffer.get_batched_read()
             y = self.convert_to_target_language(y_raw)
             yield x, y, ref, dacs, read_id
