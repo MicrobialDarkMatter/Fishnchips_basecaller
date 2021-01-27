@@ -38,8 +38,8 @@ class InferenceController():
         y = tf.expand_dims(y, 1) # (batch_size, 1)
 
         end_tokens = np.zeros(batch_size, dtype=int)
-        # for i in range(model.pe_decoder_max_length):
-        for i in range(10):
+        for i in range(model.pe_decoder_max_length):
+            print(f' - - Predicting {i+1}/5')
             combined_mask = create_combined_mask(y)
             y_predition, _ = model(x, y, False, combined_mask, False) # (batch_size, i+1, vocab_size)
             y_predition = y_predition[: ,-1:, :] # (batch_size, 1, vocab_size)

@@ -1,6 +1,8 @@
 import time
+import traceback 
 import mappy as mp
 
+from src.utils.base_converter import convert_to_base_strings
 from src.utils.assembler import assemble_and_output
 from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
@@ -68,8 +70,9 @@ class TestingController():
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
                     print(f"{i:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
-                    y_batch_pred = self.inference_controller.predict_batch(x_batch, self.model)
-                    y_pred.extend(y_batch_pred)
+                    y_batch_pred = self.inference_controller.predict_batch_opt(x_batch, self.model)
+                    y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
+                    y_pred.extend(y_batch_pred_strings)
                 
                 assembly = self.get_assembly(y_pred, i, read_id)
                 result = self.get_result(assembly, read_id)
@@ -80,3 +83,4 @@ class TestingController():
                 self.file_controller.save_evaluation(self.results)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
