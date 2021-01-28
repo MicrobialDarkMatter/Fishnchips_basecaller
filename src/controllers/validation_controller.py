@@ -42,5 +42,4 @@ class ValidationController():
                 print(e)
                        
         print()
-        print(f' - - Batch:{batch+1}/{batches} | Validation loss:{validation_loss} | Current average edit distance:{average_editdistance}.', end="\r")
         return validation_loss / performed if performed > 0 else 0
