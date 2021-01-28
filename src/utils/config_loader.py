@@ -24,7 +24,7 @@ def verify_model_config(model_config):
     assert type(model_config['dff']) == int and model_config['dff'] > 0, 'Depth of the feed forward network must be a posotove integer.'
     assert type(model_config['num_heads']) == int and model_config['num_heads'] > 0, 'Number of attention heads must be a positive integer.'
     assert type(model_config['dropout_rate']) == float and 0 <= model_config['dropout_rate'] < 1, 'Drop out rate must be a float between 0 (included) and 1.'
-    assert type(model_config['maxpool_kernel']) == int and model_config['label_window_size'] % model_config['maxpool_kernel'] == 0, 'Maxpool kernel size must be a positive integer and must devide window length with a remainder of 0.'
+    assert type(model_config['maxpool_kernel']) == int and model_config['signal_window_size'] % model_config['maxpool_kernel'] == 0, 'Maxpool kernel size must be a positive integer and must devide window length with a remainder of 0.'
 
 def verify_train_config(train_config, model_config):
     assert os.path.exists(train_config['data']), 'Invalid train data directory.'

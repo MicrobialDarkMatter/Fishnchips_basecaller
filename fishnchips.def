@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: ubuntu:18.04
+From: nvidia/cuda:9.2-runtime-ubuntu16.04
 
 %help
     FishNChips basecaller container
@@ -10,12 +10,20 @@ From: ubuntu:18.04
 %post
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
     apt-get -qq -y update
-    apt-get -y install python3.7
-    apt-get -y install python3-pip
-    apt-get -y install zlib1g-dev
+    apt-get -y install vim
+    apt-get -y install software-properties-common
+    add-apt-repository -y ppa:deadsnakes/ppa
+    apt-get -qq -y update
+
+    apt -y install python3.7
+    apt-get -y install python3.7-dev
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+    update-alternatives --set python3 /usr/bin/python3.7
+    apt -y install python3-pip
+    apt -y install zlib1g-dev
 
     pip3 install --upgrade pip
-    pip3 install tensorflow==2.3.0
+    pip3 install tensorflow==2.3
     pip3 install mappy
     pip3 install editdistance
     pip3 install ont-fast5-api
@@ -23,5 +31,4 @@ From: ubuntu:18.04
     pip3 install h5py
 
 %runscript
-    cd ~/FishNChips_g2
-    python3 ./run_fishnchips_noprops.py --config ./configs/test_config.json --name experiment_1
+    echo Container is running. Run the shell, please and thank you.
