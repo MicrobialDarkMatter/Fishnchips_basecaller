@@ -8,8 +8,6 @@ data/*
 
 trained_models/*
 !trained_models/test_experiment
-
-configs/*
 !configs/test_config.json
 
 temps
