@@ -21,6 +21,7 @@ def verify_args(args):
 
 def set_logging(args):
     if args.warnings == False:
+        print(' - Hiding tensorflow output messages.')
         tf.get_logger().setLevel('ERROR')
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
