@@ -71,8 +71,19 @@ def get_testing_controller(config, experiment_name, model, append=False):
     generator = get_raw_generator(config)
     return TestingController(config, experiment_name, model, generator, append)
 
+def train(config, experiment_name):
+    model = get_model(config)
+    controller = get_training_controller(config, experiment_name, model)
+    trained_model = controller.train()
+    return trained_model
+
 def validate(config, experiment_name):
     model = get_trained_model(config, experiment_name)
     controller = get_validation_controller(config)
     editdistance = controller.validate(model)
     return editdistance
+
+def test(config, experiment_name, append=True):
+    model = get_trained_model(config, experiment_name)
+    controller = get_testing_controller(config, experiment_name, model, append)
+    controller.test()

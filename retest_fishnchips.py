@@ -3,8 +3,6 @@ import src.api as api
 import argparse
 import os
 
-from src.controllers.ui_controller import UIController
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', required=True, help='Config filepath.')
@@ -24,34 +22,12 @@ def set_logging(args):
         tf.get_logger().setLevel('ERROR')
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-def get_user_input(ui_controller):
-    ui_controller.print_parameters('model')
-    ui_controller.ask_parameters()
-    ui_controller.print_parameters('training')
-    ui_controller.print_parameters('validation')
-    ui_controller.print_parameters('testing')
-    ui_controller.ask_parameters()
-    ui_controller.ask_retrain()
-    ui_controller.ask_retest()
-    return ui_controller.retrain, ui_controller.retest, ui_controller.append_test
-
 def main(config_path, experiment_name):
     config = api.get_config(config_path)
     api.setup_experiment(experiment_name)
-
-    ui_controller = UIController(config, experiment_name)
-    retrain, retest, append_test = get_user_input(ui_controller)
-    # TODO: Continue training?
-
-    if retrain:
-        api.train(config, experiment_name)
-    if retest:
-        api.test(config, experiment_name, append_test)
+    api.test(config, experiment_name, append=False)
 
 if __name__ == "__main__":
     args = parse_args()
     main(args.config, args.name)
-    print(' - Script has finished successfully.')
-    
-    
-     
+    print(' - Script has finished successfully.') 
