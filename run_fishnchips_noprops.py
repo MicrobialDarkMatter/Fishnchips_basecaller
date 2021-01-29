@@ -6,7 +6,7 @@ import os
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.utils.config_loader import load_config
-from src.api import get_model, get_trained_model, setup_experiment, get_training_controller, get_testing_controller
+from src.api import get_model, setup_experiment, get_training_controller, get_testing_controller
 
 def parse_args():
     parser = argparse.ArgumentParser()
