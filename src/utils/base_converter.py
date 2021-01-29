@@ -8,16 +8,23 @@ base_map = {
     6: 'E'
 }    
 
-def convert_to_base_strings(base_lists):
+"""
+Param int_base_lists: list of int base lists (e.g. [[1,2,3],[1,1,1],[2,2,2]], corresponding to ['ACG',...])
+Param skip_tokens: list of tokens to skip during conversion. Defualt S,E,P - skips start, end and padding tokens
+Returns: list of base strings
+"""
+def convert_to_base_strings(int_base_lists, skip_tokens=['S', 'E', 'P']):
     base_strings = []
-    for base_list in base_lists:
-        base_string = convert_to_base_string(base_list)
+    for int_base_list in int_base_lists:
+        base_string = convert_to_base_string(int_base_list)
         base_strings.append(base_string)
     return base_strings
 
-def convert_to_base_string(base_list):
+def convert_to_base_string(int_base_list, skip_tokens=['S', 'E', 'P']):
     base_string = ''
-    for base_token in base_list:
-        base_string += base_map[base_token]
+    for int_base_token in int_base_list:
+        str_base_token = base_map[int_base_token]
+        if str_base_token not in skip_tokens:
+            base_string += str_base_token
     return base_string
                 

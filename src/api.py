@@ -8,6 +8,10 @@ from src.controllers.validation_controller import ValidationController
 from src.controllers.training_controller import TrainingController
 from src.controllers.testing_controller import TestingController
 from src.controllers.file_controller import FileController
+from src.utils.config_loader import load_config
+
+def get_config(path):
+    return load_config(path)
 
 def get_loader(config, key='training'):
     data_path = config[key]['data']
@@ -43,7 +47,9 @@ def get_model(config):
 
 def get_trained_model(config, experiment_name):
     model = get_model(config)
-    trained_model_path = FileController(experiment_name).get_model_filepath()
+    file_controller = FileController(experiment_name)
+    assert file_controller.trained_model_exists(), ' ! Unable to load trained model. Invalid experiment name.'
+    trained_model_path = file_controller.get_model_filepath()
     trained_model = model.load_weights(trained_model_path)
     return model
 
@@ -64,3 +70,9 @@ def get_training_controller(config, experiment_name, model):
 def get_testing_controller(config, experiment_name, model, append=False):
     generator = get_raw_generator(config)
     return TestingController(config, experiment_name, model, generator, append)
+
+def validate(config, experiment_name):
+    model = get_trained_model(config, experiment_name)
+    controller = get_validation_controller(config)
+    editdistance = controller.validate(model)
+    return editdistance

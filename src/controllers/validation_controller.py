@@ -5,6 +5,7 @@ import time
 import math
 
 from src.controllers.inference_controller import InferenceController
+from src.utils.base_converter import convert_to_base_string
 
 class ValidationController():
     def __init__(self, config, generator):
@@ -23,8 +24,8 @@ class ValidationController():
         for r in range(self.reads):
             print(f' - - validating read {r+1}/{self.reads}', end='\r')
             try:
-                x, y_label, _, _, read_id = next(self.generator.get_batched_read())
-                assert len(x) == len(y_label), f' ! validation of {read_id} has failed - number of signal & label windows varies.'
+                x, y_true, _, _, read_id = next(self.generator.get_batched_read())
+                assert len(x) == len(y_true), f' ! validation of {read_id} has failed - number of signal & label windows varies.'
                 
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
@@ -33,8 +34,10 @@ class ValidationController():
                     y_pred.extend(y_batch_pred)
 
                 total_editdistance = 0
-                for pred, label in zip(y_pred, y_label):
-                    total_editdistance += editdistance.eval(pred, label)
+                for pred, true in zip(y_pred, y_true):
+                    pred_str = convert_to_base_string(pred, skip_tokens=['S', 'E', 'P'])
+                    true_str = convert_to_base_string(pred, skip_tokens=['S', 'E', 'P'])
+                    total_editdistance += editdistance.eval(pred_str, true_str)
                 average_editdistance = total_editdistance / self.batch_size
                 validation_loss += average_editdistance
                 performed += 1
