@@ -21,6 +21,12 @@ class DataBuffer():
         np.random.shuffle(read_ids)
         self.read_ids = read_ids
 
+    def set_position(self, increment):
+        self.position = self.position + increment
+        if self.position > len(self.read_ids):
+            self.position = 0
+            self.set_read_ids()
+
     def get_batch(self):
         while len(self.label_windows) < self.batch_size:
             self.fetch()
@@ -35,7 +41,7 @@ class DataBuffer():
         read_id = self.read_ids[self.position]
         dacs, ref, _ = self.data_loader.load_read(read_id)
         read_x, read_y = self.get_segmented_read(read_id)
-        self.position += 1
+        self.set_position(increment=1)
         return np.array(read_x), np.array(read_y), list(ref), dacs, read_id
         
     def fetch(self):        
@@ -46,8 +52,8 @@ class DataBuffer():
 
             self.signal_windows.extend(read_x)
             self.label_windows.extend(read_y)
-            found += 1        
-        self.position += skips + found
+            found += 1      
+        self.set_position(increment=skips + found)  
 
     def drop(self):
         self.signal_windows = self.signal_windows[self.batch_size+1:]

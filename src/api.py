@@ -74,4 +74,5 @@ def get_testing_controller(config, experiment_name, model, append=False):
 def validate(config, experiment_name):
     model = get_trained_model(config, experiment_name)
     controller = get_validation_controller(config)
-    controller.validate(model)
+    editdistance = controller.validate(model)
+    return editdistance
