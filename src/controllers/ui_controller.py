@@ -8,30 +8,40 @@ class UIController():
     def __init__(self, config, experiment_name):
         self.config = config
         self.file_controller = FileController(experiment_name)
-        self.retrain = True
-        self.retest = True
-        self.append_test = False
+
+        self.skip_training = False
+        self.discard_training = False
+        self.continue_training = True 
+
+        self.skip_testing = False
+        self.discard_testing = False 
+        self.continue_testing = True
         
     def ask_retrain(self):
         if self.file_controller.trained_model_exists() == False:
-            print(' - Model will be trained as a trained model was not found.')
+            print(' - Trained model not found. Model will be trained.')
             return
         message = 'A trained model already exists, would you like to retrain it?'
-        choices = ['skip training', 'retrain']
+        choices = ['skip training', 'continue training existing model', 'discard existing model']
         question = inquirer.List('retrain', message, choices)
         answer = inquirer.prompt([question])
-        self.retrain = answer['retrain'] == 'retrain'
-
+        
+        self.skip_training = answer['retrain'] == 'skip training'
+        self.discard_training = answer['retrain'] == 'discard existing model'
+        self.continue_training = answer['retrain'] == 'continue training existing model'
+        
     def ask_retest(self):
         if self.file_controller.evaluation_exists() == False:
-            print(' - Model will be tested as its evaluation was not found.')
+            print(' - Testing results not found. Model will be tested.')
             return
         message = 'Model evaluation already exists, what would you like to do?'
-        choices = ['skip evaluation', 're-evaluate', 'append to existing']
+        choices = ['skip testing', 'append to existing results', 'discard existing results']
         question = inquirer.List('retest', message, choices)
         answer = inquirer.prompt([question])
-        self.retest = answer['retest'] in ['re-evaluate', 'append to existing']
-        self.append_test = answer['retest'] == 'append to existing'
+
+        self.skip_testing = answer['retest'] == 'skip testing'
+        self.discard_testing = answer['retest'] == 'discard existing results'
+        self.continue_testing = answer['retest'] == 'append to existing results'
 
     def ask_parameters(self):
         message = 'Continue with these experiment parameters?'
