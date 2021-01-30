@@ -34,14 +34,20 @@ class UIController():
         if self.file_controller.evaluation_exists() == False:
             print(' - Testing results not found. Model will be tested.')
             return
-        message = 'Model evaluation already exists, what would you like to do?'
-        choices = ['skip testing', 'append to existing results', 'discard existing results']
+        message = 'Model testing results already exist, what would you like to do?'      
+        choices = self.get_retest_choices()
         question = inquirer.List('retest', message, choices)
         answer = inquirer.prompt([question])
 
         self.skip_testing = answer['retest'] == 'skip testing'
         self.discard_testing = answer['retest'] == 'discard existing results'
         self.continue_testing = answer['retest'] == 'append to existing results'
+
+    def get_retest_choices(self):
+        if self.discard_training or self.continue_training:
+            return ['skip testing', 'discard existing results'] # Do not allow to append testing analysis if model is retrained or improved
+        else:
+            return ['skip testing', 'append to existing results', 'discard existing results']
 
     def ask_parameters(self):
         message = 'Continue with these experiment parameters?'
