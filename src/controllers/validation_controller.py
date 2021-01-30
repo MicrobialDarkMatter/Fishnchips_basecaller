@@ -43,6 +43,7 @@ class ValidationController():
                 performed += 1
             except Exception as e:
                 print(e)
+                traceback.print_exc()
                        
         print()
         return validation_loss / performed if performed > 0 else -1
