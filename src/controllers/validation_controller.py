@@ -45,4 +45,4 @@ class ValidationController():
                 print(e)
                        
         print()
-        return validation_loss / performed if performed > 0 else 0
+        return validation_loss / performed if performed > 0 else -1

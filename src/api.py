@@ -80,10 +80,10 @@ def get_validation_controller(config):
     generator = get_generator(config, key='validation')
     return ValidationController(config, generator)
 
-def get_training_controller(config, experiment_name, model):
+def get_training_controller(config, experiment_name, model, discard_existing=False):
     validation_controller = get_validation_controller(config)
     generator = get_generator(config, key='training')
-    return TrainingController(config, experiment_name, model, generator, validation_controller)
+    return TrainingController(config, experiment_name, model, generator, validation_controller, discard_existing)
 
 def get_testing_controller(config, experiment_name, model, discard_existing=False):
     generator = get_raw_generator(config)
@@ -93,7 +93,7 @@ def train(config, experiment_name, discard_existing=False):
     if discard_existing:
         discard_training(experiment_name)
     model = get_model(config, experiment_name, discard_existing)
-    controller = get_training_controller(config, experiment_name, model)
+    controller = get_training_controller(config, experiment_name, model, discard_existing)
     trained_model = controller.train()
     return trained_model
 

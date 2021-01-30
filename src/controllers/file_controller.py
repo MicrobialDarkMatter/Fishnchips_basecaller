@@ -1,5 +1,6 @@
 import os
 import json
+import numpy as np
 
 class FileController():
     def __init__(self, experiment_name):
@@ -25,7 +26,10 @@ class FileController():
 
     def evaluation_exists(self):
         return os.path.exists(self.get_evaluation_filepath())
-        
+
+    def training_result_exists(self):
+        return os.path.exists(self.get_training_filepath())
+
     def create_experiment_dir(self):
         try: 
             if os.path.exists(self.path):
@@ -50,9 +54,20 @@ class FileController():
         with open(self.get_evaluation_filepath(), 'r') as f:
             return json.load(f)
 
+    def load_training(self):
+        assert self.training_result_exists(), f'Training result was requested, but {self.get_training_filepath()} does not exist.'
+        return np.load(self.get_training_filepath())        
+
     def save_evaluation(self, evaluation):
         with open(self.get_evaluation_filepath(), 'w') as f:
             json.dump(evaluation, f, indent=4)
+
+    def save_training(self, results):
+        np.save(results)
+
+    def save_model(self, model):
+        path = self.get_model_filepath()
+        model.save_weights(path)
 
     def teardown_evaluation(self):
         path = self.get_evaluation_filepath()
