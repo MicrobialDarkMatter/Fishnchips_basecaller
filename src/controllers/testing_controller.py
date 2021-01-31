@@ -8,7 +8,7 @@ from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
 
 class TestingController():
-    def __init__(self, config, experiment_name, model, generator, append):
+    def __init__(self, config, experiment_name, model, generator, new_testing):
         test_config = config['testing']
         model_config = config['model']
 
@@ -23,7 +23,7 @@ class TestingController():
         self.file_controller = FileController(experiment_name)
         self.model_filepath = self.file_controller.get_model_filepath()
         self.evaliation_filepath = self.file_controller.get_evaluation_filepath()
-        self.results = file_controller.load_evaluation if append else []
+        self.results = [] if new_testing else self.file_controller.load_evaluation()
 
     def pretty_print_progress(self, start, end, total):
         progress_str = '['
@@ -63,7 +63,7 @@ class TestingController():
 
     def test(self):
         print(' - Testing model.')
-        for i in range(len(self.results), self.reads):
+        for i in range(self.reads):
             try:
                 x, read_id = next(self.generator.get_batched_read())
                 start_time = time.time()

@@ -1,5 +1,4 @@
 import tensorflow as tf
-import numpy as np
 import time
 import math
 import sys
@@ -14,16 +13,15 @@ from src.utils.data_buffer import DataBuffer
 from src.utils.data_loader import DataLoader
 
 class TrainingController():
-    def __init__(self, config, experiment_name, model, generator, validation_controller):
+    def __init__(self, config, experiment_name, model, generator, validation_controller, new_training):
         training_config = config['training']
         model_config = config['model']
         
         self.generator = generator
         self.validation_controller = validation_controller
         
-        file_controller = FileController(experiment_name)
-        self.model_path = file_controller.get_model_filepath()
-        self.training_path = file_controller.get_training_filepath()
+        self.file_controller = FileController(experiment_name)
+        self.results = [] if new_training else self.file_controller.load_training()
 
         self.epochs = training_config['epochs']
         self.patience = training_config['patience']
@@ -41,9 +39,9 @@ class TrainingController():
     def train(self):
         print(' - Training model.')
         waited = 0
-        old_validation_loss= 1e10
-        model_weights = None
-        accuracies = []
+        validation_loss= 1e10 if self.results == [] else self.get_best_validation_loss()
+        print(f' - Initial validation loss: {validation_loss}.')
+        model_weights = self.model.get_weights()
 
         for epoch in range(self.epochs):
             waited = 0 if epoch < self.warmup else waited
@@ -59,16 +57,16 @@ class TrainingController():
                 print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
             print()
 
-            validation_loss = self.validation_controller.validate(self.model)
-            accuracies.append([self.train_loss.result(), self.train_accuracy.result(), validation_loss, time.time()])
-            np.save(self.training_path, np.array(accuracies)) 
+            current_validation_loss = self.validation_controller.validate(self.model)
+            self.results.append([self.train_loss.result(), self.train_accuracy.result(), validation_loss, time.time()])
+            self.file_controller.save_training(self.results)            
             print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{validation_loss} | Took:{time.time() - start_time} secs')
 
-            if validation_loss < old_validation_loss:
+            if current_validation_loss < validation_loss:
                 waited = 0
-                old_validation_loss = validation_loss
+                validation_loss = current_validation_loss
                 print(' - - Model validation accuracy improvement - saving model weights.')
-                self.model.save_weights(self.model_path)
+                self.file_controller.save_model(self.model)                
                 model_weights = self.model.get_weights()
             else:
                 waited += 1
@@ -93,3 +91,13 @@ class TrainingController():
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
         self.train_accuracy(y_label, y_prediction)
+
+    def get_best_validation_loss(self):
+        validation_losses = self.results[:,2]
+        min_validation_loss = 1e10
+        for validation_loss in validation_losses:
+            if validation_loss < 0:
+                continue
+            if validation_loss < min_validation_loss:
+                min_validation_loss = validation_loss
+        return min_validation_loss

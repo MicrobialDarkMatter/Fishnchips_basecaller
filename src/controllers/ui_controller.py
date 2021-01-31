@@ -8,30 +8,52 @@ class UIController():
     def __init__(self, config, experiment_name):
         self.config = config
         self.file_controller = FileController(experiment_name)
-        self.retrain = True
-        self.retest = True
-        self.append_test = False
-        
+
+        self.skip_training = False
+        self.new_training = False
+        self.continue_training = True 
+
+        self.skip_testing = False
+        self.new_testing = False 
+        self.continue_testing = True
+    
     def ask_retrain(self):
         if self.file_controller.trained_model_exists() == False:
-            print(' - Model will be trained as a trained model was not found.')
+            print(' - Trained model not found. Model will be trained.')
+            self.continue_training = False
+            self.skip_training = False
+            self.new_training = True
             return
         message = 'A trained model already exists, would you like to retrain it?'
-        choices = ['skip training', 'retrain']
+        choices = ['skip training', 'continue training existing model', 'new training (discard existing)']
         question = inquirer.List('retrain', message, choices)
         answer = inquirer.prompt([question])
-        self.retrain = answer['retrain'] == 'retrain'
-
+        
+        self.skip_training = answer['retrain'] == 'skip training'
+        self.new_training = answer['retrain'] == 'new training (discard existing)'
+        self.continue_training = answer['retrain'] == 'continue training existing model'
+        
     def ask_retest(self):
         if self.file_controller.evaluation_exists() == False:
-            print(' - Model will be tested as its evaluation was not found.')
+            print(' - Testing results not found. Model will be tested.')
+            self.continue_testing = False 
+            self.skip_testing = False 
+            self.new_testing = True
             return
-        message = 'Model evaluation already exists, what would you like to do?'
-        choices = ['skip evaluation', 're-evaluate', 'append to existing']
+        message = 'Model testing results already exist, what would you like to do?'      
+        choices = self.get_retest_choices()
         question = inquirer.List('retest', message, choices)
         answer = inquirer.prompt([question])
-        self.retest = answer['retest'] in ['re-evaluate', 'append to existing']
-        self.append_test = answer['retest'] == 'append to existing'
+
+        self.skip_testing = answer['retest'] == 'skip testing'
+        self.new_testing = answer['retest'] == 'new testing (discard existing)'
+        self.continue_testing = answer['retest'] == 'append to existing results'
+
+    def get_retest_choices(self):
+        if self.new_training or self.continue_training:
+            return ['skip testing', 'new testing (discard existing)'] # Do not allow to append testing analysis if model is retrained or improved
+        else:
+            return ['skip testing', 'append to existing results', 'new testing (discard existing)']
 
     def ask_parameters(self):
         message = 'Continue with these experiment parameters?'

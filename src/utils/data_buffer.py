@@ -23,7 +23,7 @@ class DataBuffer():
 
     def set_position(self, increment):
         self.position = self.position + increment
-        if self.position > len(self.read_ids):
+        if self.position >= len(self.read_ids):
             self.position = 0
             self.set_read_ids()
 

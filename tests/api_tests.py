@@ -12,7 +12,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tests.utils.assert_that import AssertThat 
 from tests.utils.printer import print_test_result 
 from src.utils.config_loader import load_config
-from src.api import get_loader, get_buffer, get_generator, get_model, get_trained_model
+from src.api import get_loader, get_buffer, get_generator, get_new_model, get_trained_model
 from src.model.FishNChips import FishNChips
 
 def test_API_get_loader(config):
@@ -47,9 +47,9 @@ def test_API_get_generator(config):
     result = AssertThat(actual, expected).are_equal()
     print_test_result(result, test_name, expected, actual)
 
-def test_API_get_model(config):
-    test_name = test_API_get_model.__name__
-    actual = get_model(config)
+def test_API_get_new_model(config):
+    test_name = test_API_get_new_model.__name__
+    actual = get_new_model(config)
     result = AssertThat(actual).is_instance_of(FishNChips)
     print_test_result(result, test_name, 'Is isntance of FishNChips', actual)
 
@@ -65,7 +65,7 @@ def run_tests():
     test_API_get_loader(config)
     test_API_get_buffer(config)
     test_API_get_generator(config)
-    test_API_get_model(config)
+    test_API_get_new_model(config)
     test_API_get_trained_model(config, experiment_name)
 
 run_tests()

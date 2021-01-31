@@ -34,20 +34,20 @@ def get_user_input(ui_controller):
     ui_controller.ask_parameters()
     ui_controller.ask_retrain()
     ui_controller.ask_retest()
-    return ui_controller.retrain, ui_controller.retest, ui_controller.append_test
+    return ui_controller
 
 def main(config_path, experiment_name):
     config = api.get_config(config_path)
     api.setup_experiment(experiment_name)
 
     ui_controller = UIController(config, experiment_name)
-    retrain, retest, append_test = get_user_input(ui_controller)
-    # TODO: Continue training?
+    ui_controller = get_user_input(ui_controller)
 
-    if retrain:
-        api.train(config, experiment_name)
-    if retest:
-        api.test(config, experiment_name, append_test)
+    if ui_controller.skip_training == False:
+        api.train(config, experiment_name, ui_controller.new_training)
+    
+    if ui_controller.skip_testing == False:
+        api.test(config, experiment_name, ui_controller.new_testing)
 
 if __name__ == "__main__":
     args = parse_args()
