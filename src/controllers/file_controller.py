@@ -56,7 +56,9 @@ class FileController():
 
     def load_training(self):
         assert self.training_result_exists(), f'Training result was requested, but {self.get_training_filepath()} does not exist.'
-        return np.load(self.get_training_filepath())        
+        training = np.load(self.get_training_filepath())    
+        training = training.tolist()
+        return training    
 
     def save_evaluation(self, evaluation):
         with open(self.get_evaluation_filepath(), 'w') as f:
