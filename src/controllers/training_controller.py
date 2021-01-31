@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 import time
 import math
 import sys
@@ -93,7 +94,8 @@ class TrainingController():
         self.train_accuracy(y_label, y_prediction)
 
     def get_best_validation_loss(self):
-        validation_losses = self.results[:,2]
+        results = np.array(self.results)
+        validation_losses = results[:,2]
         min_validation_loss = 1e10
         for validation_loss in validation_losses:
             if validation_loss < 0:
