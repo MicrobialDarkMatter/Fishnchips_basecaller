@@ -16,7 +16,7 @@
         "epochs": 1000,
         "warmup":100, 
         "patience": 300,
-        "batches":1000,
+        "batches":3000,
         "batch_size":32,
         "buffer_size":5,
         "lr_mult": 100,
@@ -26,15 +26,15 @@
         "data":"./data/validation.hdf5",
         "batch_size":300,
         "buffer_size":5,
-        "reads":3,
+        "reads":10,
         "signal_window_stride":300
     },
     "testing":{
-        "data":"./data/Klebsiella_pneumoniae_INF042_fast5s",
+        "data":"./data/sample_test_data/Acinetobacter_pittii_16-377-0801",
         "batch_size":300,
         "buffer_size":5,
         "signal_window_stride":30,
-        "reads":100,
-        "reference":"./data/Klebsiella_pneumoniae_INF042_reference.fasta"
+        "reads":20,
+        "reference":"./data/sample_test_data/Acinetobacter_pittii_16-377-0801/reference.fasta"
     }
 }
