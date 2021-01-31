@@ -20,6 +20,9 @@ class UIController():
     def ask_retrain(self):
         if self.file_controller.trained_model_exists() == False:
             print(' - Trained model not found. Model will be trained.')
+            self.continue_training = False
+            self.skip_training = False
+            self.discard_training = True
             return
         message = 'A trained model already exists, would you like to retrain it?'
         choices = ['skip training', 'continue training existing model', 'discard existing model']
@@ -33,6 +36,9 @@ class UIController():
     def ask_retest(self):
         if self.file_controller.evaluation_exists() == False:
             print(' - Testing results not found. Model will be tested.')
+            self.continue_testing = False 
+            self.skip_testing = False 
+            self.discard_testing = True
             return
         message = 'Model testing results already exist, what would you like to do?'      
         choices = self.get_retest_choices()

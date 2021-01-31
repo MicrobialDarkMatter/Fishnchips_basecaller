@@ -63,7 +63,8 @@ class FileController():
             json.dump(evaluation, f, indent=4)
 
     def save_training(self, results):
-        np.save(results)
+        path = self.get_training_filepath()
+        np.save(path, results)
 
     def save_model(self, model):
         path = self.get_model_filepath()
