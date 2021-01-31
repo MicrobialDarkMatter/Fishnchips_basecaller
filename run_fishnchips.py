@@ -44,10 +44,10 @@ def main(config_path, experiment_name):
     ui_controller = get_user_input(ui_controller)
 
     if ui_controller.skip_training == False:
-        api.train(config, experiment_name, ui_controller.discard_training)
+        api.train(config, experiment_name, ui_controller.new_training)
     
     if ui_controller.skip_testing == False:
-        api.test(config, experiment_name, ui_controller.discard_testing)
+        api.test(config, experiment_name, ui_controller.new_testing)
 
 if __name__ == "__main__":
     args = parse_args()

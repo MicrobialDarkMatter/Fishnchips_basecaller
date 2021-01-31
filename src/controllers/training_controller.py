@@ -13,7 +13,7 @@ from src.utils.data_buffer import DataBuffer
 from src.utils.data_loader import DataLoader
 
 class TrainingController():
-    def __init__(self, config, experiment_name, model, generator, validation_controller, discard_existing):
+    def __init__(self, config, experiment_name, model, generator, validation_controller, new_training):
         training_config = config['training']
         model_config = config['model']
         
@@ -21,7 +21,7 @@ class TrainingController():
         self.validation_controller = validation_controller
         
         self.file_controller = FileController(experiment_name)
-        self.results = [] if discard_existing else self.file_controller.load_training()
+        self.results = [] if new_training else self.file_controller.load_training()
 
         self.epochs = training_config['epochs']
         self.patience = training_config['patience']

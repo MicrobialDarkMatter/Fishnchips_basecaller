@@ -10,27 +10,27 @@ class UIController():
         self.file_controller = FileController(experiment_name)
 
         self.skip_training = False
-        self.discard_training = False
+        self.new_training = False
         self.continue_training = True 
 
         self.skip_testing = False
-        self.discard_testing = False 
+        self.new_testing = False 
         self.continue_testing = True
-        
+    
     def ask_retrain(self):
         if self.file_controller.trained_model_exists() == False:
             print(' - Trained model not found. Model will be trained.')
             self.continue_training = False
             self.skip_training = False
-            self.discard_training = True
+            self.new_training = True
             return
         message = 'A trained model already exists, would you like to retrain it?'
-        choices = ['skip training', 'continue training existing model', 'discard existing model']
+        choices = ['skip training', 'continue training existing model', 'new training (discard existing)']
         question = inquirer.List('retrain', message, choices)
         answer = inquirer.prompt([question])
         
         self.skip_training = answer['retrain'] == 'skip training'
-        self.discard_training = answer['retrain'] == 'discard existing model'
+        self.new_training = answer['retrain'] == 'new training (discard existing)'
         self.continue_training = answer['retrain'] == 'continue training existing model'
         
     def ask_retest(self):
@@ -38,7 +38,7 @@ class UIController():
             print(' - Testing results not found. Model will be tested.')
             self.continue_testing = False 
             self.skip_testing = False 
-            self.discard_testing = True
+            self.new_testing = True
             return
         message = 'Model testing results already exist, what would you like to do?'      
         choices = self.get_retest_choices()
@@ -46,14 +46,14 @@ class UIController():
         answer = inquirer.prompt([question])
 
         self.skip_testing = answer['retest'] == 'skip testing'
-        self.discard_testing = answer['retest'] == 'discard existing results'
+        self.new_testing = answer['retest'] == 'new testing (discard existing)'
         self.continue_testing = answer['retest'] == 'append to existing results'
 
     def get_retest_choices(self):
-        if self.discard_training or self.continue_training:
-            return ['skip testing', 'discard existing results'] # Do not allow to append testing analysis if model is retrained or improved
+        if self.new_training or self.continue_training:
+            return ['skip testing', 'new testing (discard existing)'] # Do not allow to append testing analysis if model is retrained or improved
         else:
-            return ['skip testing', 'append to existing results', 'discard existing results']
+            return ['skip testing', 'append to existing results', 'new testing (discard existing)']
 
     def ask_parameters(self):
         message = 'Continue with these experiment parameters?'

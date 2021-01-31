@@ -53,25 +53,17 @@ def get_trained_model(config, experiment_name):
     trained_model = model.load_weights(trained_model_path)
     return model
 
-def get_model(config, experiment_name, discard_existing=False):
-    file_controller = FileController(experiment_name)
-    if file_controller.trained_model_exists() and discard_existing:
-        return get_new_model(config)
-    if file_controller.trained_model_exists():
-        return get_trained_model(config, experiment_name)
-    return get_new_model(config)
-
 def setup_experiment(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.create_experiment_dir()
     file_controller.create_assembly_directory()
 
-def discard_training(experiment_name):
+def discard_existing_training(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.teardown_training()
     file_controller.teardown_model()    
 
-def discard_testing(experiment_name):
+def discard_existing_testing(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.teardown_evaluation()
     file_controller.teardown_assemblies()   
@@ -89,11 +81,13 @@ def get_testing_controller(config, experiment_name, model, discard_existing=Fals
     generator = get_raw_generator(config)
     return TestingController(config, experiment_name, model, generator, discard_existing)
 
-def train(config, experiment_name, discard_existing=False):
-    if discard_existing:
-        discard_training(experiment_name)
-    model = get_model(config, experiment_name, discard_existing)
-    controller = get_training_controller(config, experiment_name, model, discard_existing)
+def train(config, experiment_name, new_training=False):
+    if new_training:
+        discard_existing_training(experiment_name)
+        model = get_new_model(config)
+    else:
+        model = get_trained_model(config, experiment_name)
+    controller = get_training_controller(config, experiment_name, model, new_training)
     trained_model = controller.train()
     return trained_model
 
@@ -103,9 +97,9 @@ def validate(config, experiment_name):
     editdistance = controller.validate(model)
     return editdistance
 
-def test(config, experiment_name, discard_existing=False):
-    if discard_existing:
-        discard_testing(experiment_name)
+def test(config, experiment_name, new_testing=False):
+    if new_testing:
+        discard_existing_testing(experiment_name)
     model = get_trained_model(config, experiment_name)
-    controller = get_testing_controller(config, experiment_name, model, discard_existing)
+    controller = get_testing_controller(config, experiment_name, model, new_testing)
     controller.test()

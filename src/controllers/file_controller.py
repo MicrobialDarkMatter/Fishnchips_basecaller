@@ -90,7 +90,9 @@ class FileController():
         
     def teardown_assemblies(self):
         directory = self.get_assembly_directory_path()
-        print(' ! Removing assemblies.')
-        for filename in os.listdir(directory):
-            filepath = os.path.join(directory, filename)
-            os.remove(filepath)
+        assembly_files = os.listdir(directory)
+        if assembly_files != []:
+            print(' ! Removing assemblies.')
+            for filename in assembly_files:
+                filepath = os.path.join(directory, filename)
+                os.remove(filepath)
