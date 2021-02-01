@@ -19,7 +19,7 @@ class FileController():
         return f'{self.path}/assemblies'
 
     def get_assembly_filepath(self, read_id, iteration):
-        return f'{self.get_assembly_directory_path}/{iteration}_read_id_{read_id}.txt'
+        return f'{self.get_assembly_directory_path()}/{iteration}_read_id_{read_id}.txt'
 
     def trained_model_exists(self):
         return os.path.exists(self.get_model_filepath())
