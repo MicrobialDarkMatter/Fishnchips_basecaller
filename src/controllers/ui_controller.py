@@ -34,7 +34,7 @@ class UIController():
         self.continue_training = answer['retrain'] == 'continue training existing model'
         
     def ask_retest(self):
-        if self.file_controller.evaluation_exists() == False:
+        if self.file_controller.testing_result_exists() == False:
             print(' - Testing results not found. Model will be tested.')
             self.continue_testing = False 
             self.skip_testing = False 

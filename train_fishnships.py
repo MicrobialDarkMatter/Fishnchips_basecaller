@@ -25,7 +25,7 @@ def set_logging(args):
 
 def main(config_path, experiment_name, discard_existing):
     config = api.get_config(config_path)
-    api.setup_experiment(experiment_name)
+    api.setup_experiment(experiment_name, config)
     api.train(config, experiment_name, new_training=discard_existing)
 
 if __name__ == "__main__":
