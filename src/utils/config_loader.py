@@ -45,9 +45,13 @@ def vefify_validation_config(validation_config, model_config):
     assert type(validation_config['signal_window_stride']) == int and validation_config['signal_window_stride'] > 0 and validation_config['signal_window_stride'] <= model_config['signal_window_size'], 'Validation signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
 
 def verify_test_config(test_config, model_config):
-    assert os.path.exists(test_config['data']), 'Invalid test data directory.'
-    assert os.path.exists(test_config['reference']), 'Invalid test reference filepath.'
     assert type(test_config['batch_size']) == int and test_config['batch_size'] >= 0, 'Test batch size must be a positive integer.'
     assert type(test_config['buffer_size']) == int and test_config['buffer_size'] > 0, 'Test buffer size must be a positive integer.'
     assert type(test_config['signal_window_stride']) == int and test_config['signal_window_stride'] > 0 and test_config['signal_window_stride'] <= model_config['signal_window_size'], 'Test signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
     assert type(test_config['reads']) == int and test_config['reads'] > 0, 'Number of reads to test must be a positive integer.'
+
+    assert type(test_config['bacteria']) == list, 'Test bacteria must be a list.'
+    for bacteria in test_config['bacteria']:
+        assert type(bacteria['name']) and len(bacteria['name'] > 0), f'Bacteria name must be a non-empty string.'
+        assert os.path.exists(bacteria['data']), f'Invalid bacteria data directory. {bacteria['data']} does not exist.'
+        assert os.path.exists(bacteria['reference']), f'Invalid bacteria reference filepath. {bacteria['reference']} does not exist.'

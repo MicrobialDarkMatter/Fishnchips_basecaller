@@ -1,3 +1,5 @@
+import mappy as mp
+
 from src.utils.data_loader import DataLoader
 from src.utils.raw_data_loader import RawDataLoader
 from src.utils.data_buffer import DataBuffer
@@ -17,8 +19,7 @@ def get_loader(config, key='training'):
     data_path = config[key]['data']
     return DataLoader(data_path)
 
-def get_raw_loader(config):
-    data_path = config['testing']['data']
+def get_raw_loader(config, data_path):
     signal_window_size = config['model']['signal_window_size']
     signal_window_stride = config['testing']['signal_window_stride']
     return RawDataLoader(data_path, signal_window_size, signal_window_stride)
@@ -35,9 +36,9 @@ def get_generator(config, key='training'):
     buffer = get_buffer(config, key)
     label_window_size = config['model']['label_window_size']
     return DataGenerator(buffer, label_window_size)
-
-def get_raw_generator(config):
-    raw_loader = get_raw_loader(config)
+  
+def get_raw_generator(config, path):
+    loader = get_raw_loader(config, path)
     return RawDataGenerator(raw_loader)
 
 def get_new_model(config):
@@ -78,10 +79,6 @@ def get_training_controller(config, experiment_name, model, discard_existing=Fal
     generator = get_generator(config, key='training')
     return TrainingController(config, experiment_name, model, generator, validation_controller, discard_existing)
 
-def get_testing_controller(config, experiment_name, model, discard_existing=False):
-    generator = get_raw_generator(config)
-    return TestingController(config, experiment_name, model, generator, discard_existing)
-
 def train(config, experiment_name, new_training=False):
     if new_training:
         discard_existing_training(experiment_name)
@@ -102,5 +99,10 @@ def test(config, experiment_name, new_testing=False):
     if new_testing:
         discard_existing_testing(experiment_name)
     model = get_trained_model(config, experiment_name)
-    controller = get_testing_controller(config, experiment_name, model, new_testing)
-    controller.test()
+    controller = TestingController(config, experiment_name, model, new_testing)
+
+    for bacteria in config['testing']['bacteria']:
+        name = bacteria['name']
+        generator = get_raw_generator(bacteria['data'])
+        aligner = mp.Aligner(bacteria['reference'])
+        controller.test(name, generator, aligner)

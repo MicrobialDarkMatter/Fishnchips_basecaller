@@ -18,8 +18,8 @@ class FileController():
     def get_assembly_directory_path(self):
         return f'{self.path}/assemblies'
 
-    def get_assembly_filepath(self, read_id, iteration):
-        return f'{self.get_assembly_directory_path()}/{iteration}_read_id_{read_id}.txt'
+    def get_assembly_filepath(self, read_id, iteration, bacteria):
+        return f'{self.get_assembly_directory_path()}/{iteration}_{bacteria}_{read_id}.txt'
 
     def get_validation_plot_filepath(self):
         return f'{self.path}/report/validation.png'
