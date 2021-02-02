@@ -8,15 +8,14 @@ from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
 
 class TestingController():
-    def __init__(self, config, experiment_name, model, generator, new_testing):
+    def __init__(self, config, experiment_name, model, new_testing):
         test_config = config['testing']
         model_config = config['model']
-
-        self.generator = generator
+        
         self.model = model
         self.reads = test_config['reads']
         self.batch_size = test_config['batch_size']
-        self.aligner = mp.Aligner(test_config['reference'])
+
         self.use_assembler = test_config['signal_window_stride'] < model_config['signal_window_size']
         self.inference_controller = InferenceController()
 
@@ -33,23 +32,24 @@ class TestingController():
         progress_str += ']'
         return progress_str
 
-    def get_assembly(self, y_pred, iteration, read_id):
+    def get_assembly(self, y_pred, iteration, read_id, bacteria):
         if self.use_assembler == False:
             return ''.join(y_pred)
-        assembly_path = self.file_controller.get_assembly_filepath(iteration, read_id)
+        assembly_path = self.file_controller.get_assembly_filepath(iteration, read_id, bacteria)
         return assemble_and_output(assembly_path, y_pred)
 
-    def get_result(self, assembly, read_id):
+    def get_result(self, assembly, aligner, read_id, bacteria):
         try:
-            besthit = next(self.aligner.map(assembly))
+            besthit = next(aligner.map(assembly))
             cigacc = 1-(besthit.NM/besthit.blen)
-            return self.get_result_dict(read_id, besthit.ctg, besthit.r_st, besthit.r_en, besthit.NM, besthit.blen, besthit.cigar_str, cigacc)
+            return self.get_result_dict(read_id, bacteria, besthit.ctg, besthit.r_st, besthit.r_en, besthit.NM, besthit.blen, besthit.cigar_str, cigacc)
         except:
-            return self.get_result_dict(read_id, 0, 0, 0, 0, 0, 0, 0)
+            return self.get_result_dict(read_id, bacteria, 0, 0, 0, 0, 0, 0, 0)
 
-    def get_result_dict(self, read_id, ctg, r_st, r_en, nm, blen, cig, cigacc):
+    def get_result_dict(self, read_id, bacteria, ctg, r_st, r_en, nm, blen, cig, cigacc):
         return {
             'read_id':read_id,
+            'bacteria':bacteria,
             'ctg': ctg,
             'r_st': r_st,
             'r_en': r_en,
@@ -59,23 +59,23 @@ class TestingController():
             'cigacc': cigacc
         }
 
-    def test(self):
-        print(' - Testing model.')
+    def test(self, bacteria, generator, aligner):
+        print(f' - Testing {bacteria}.')
         for i in range(self.reads):
             try:
-                x, read_id = next(self.generator.get_batched_read())
+                x, read_id = next(generator.get_batched_read())
                 start_time = time.time()
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                    print(f"{i:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
+                    print(f"{i+1:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
                                        
                     y_batch_pred = self.inference_controller.predict_batch(x_batch, self.model)
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
                     y_pred.extend(y_batch_pred_strings)
                 
-                assembly = self.get_assembly(y_pred, i, read_id)
-                result = self.get_result(assembly, read_id)
+                assembly = self.get_assembly(y_pred, i, read_id, bacteria)
+                result = self.get_result(assembly, aligner, read_id, bacteria)
                 result['time'] = time.time() - start_time
                 self.results.append(result)
 

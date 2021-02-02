@@ -30,11 +30,16 @@
         "signal_window_stride":300
     },
     "testing":{
-        "data":"./data/raw_test_reads",
         "batch_size":30,
         "buffer_size":5,
         "signal_window_stride":30,
         "reads":3,
-        "reference":"./data/raw_test_reads/test_reference.fasta"
+        "bacteria":[
+            {
+                "name":"Test bacteria",
+                "data":"./data/raw_test_reads",
+                "reference":"./data/raw_test_reads/test_reference.fasta"
+            }
+        ]
     }
 }

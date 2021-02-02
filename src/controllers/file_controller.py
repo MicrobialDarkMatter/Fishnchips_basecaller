@@ -6,6 +6,9 @@ class FileController():
     def __init__(self, experiment_name):
         self.path = f'./trained_models/{experiment_name}'
     
+    def get_config_filepath(self):
+        return f'{self.path}/config.json'
+
     def get_model_filepath(self):
         return f'{self.path}/model.h5'
     
@@ -18,8 +21,8 @@ class FileController():
     def get_assembly_directory_path(self):
         return f'{self.path}/assemblies'
 
-    def get_assembly_filepath(self, read_id, iteration):
-        return f'{self.get_assembly_directory_path()}/{iteration}_read_id_{read_id}.txt'
+    def get_assembly_filepath(self, read_id, iteration, bacteria):
+        return f'{self.get_assembly_directory_path()}/{iteration}_{bacteria}_{read_id}.txt'
 
     def get_validation_plot_filepath(self):
         return f'{self.path}/report/validation.png'
@@ -98,6 +101,10 @@ class FileController():
     def save_model(self, model):
         path = self.get_model_filepath()
         model.save_weights(path)
+
+    def save_config(self, config):
+        with open(self.get_config_filepath(), 'w') as f:
+            json.dump(config, f, indent=4)
 
     def teardown_evaluation(self):
         path = self.get_testing_filepath()
