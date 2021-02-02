@@ -21,6 +21,18 @@ class FileController():
     def get_assembly_filepath(self, read_id, iteration):
         return f'{self.get_assembly_directory_path()}/{iteration}_read_id_{read_id}.txt'
 
+    def get_validation_plot_filepath(self):
+        return f'{self.path}/report/validation.png'
+
+    def get_training_plot_filepath(self):
+        return f'{self.path}/report/training.png'
+
+    def get_testing_plot_filepath(self, suffix):
+        return f'{self.path}/report/testing_{suffix}.png'
+
+    def get_evaluation_report_path(self):
+        return f'{self.path}/report/report.json'
+
     def trained_model_exists(self):
         return os.path.exists(self.get_model_filepath())
 
@@ -47,7 +59,17 @@ class FileController():
             os.makedirs(assembly_path)
         except Exception as e:
             print(e)
-            print(f' ! Error occured when creating experiment assembly directory. Path: {assembly_path}')         
+            print(f' ! Error occured when creating experiment assembly directory. Path: {assembly_path}')    
+
+    def create_report_directory(self):
+        try:
+            report_path = f'{self.path}/report'
+            if os.path.exists(report_path):
+                return
+            os.makedirs(report_path)
+        except Exception as e:
+            print(e)
+            print(f' ! Error occured when creating experiment report directory. Path: {report_path}')    
 
     def load_evaluation(self):
         assert self.evaluation_exists(), f'Evaluation was requested, but {self.get_evaluation_filepath()} does not exist.'
@@ -67,6 +89,11 @@ class FileController():
     def save_training(self, results):
         path = self.get_training_filepath()
         np.save(path, results)
+
+    def save_evaluation_report(self, report):
+        path = self.get_evaluation_report_path()
+        with open(path, 'w') as f:
+            json.dump(report, f, indent=4)
 
     def save_model(self, model):
         path = self.get_model_filepath()

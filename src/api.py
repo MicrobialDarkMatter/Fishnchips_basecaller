@@ -57,6 +57,7 @@ def setup_experiment(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.create_experiment_dir()
     file_controller.create_assembly_directory()
+    file_controller.create_report_directory()
 
 def discard_existing_training(experiment_name):
     file_controller = FileController(experiment_name)
