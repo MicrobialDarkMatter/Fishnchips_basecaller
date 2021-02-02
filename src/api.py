@@ -11,6 +11,7 @@ from src.controllers.training_controller import TrainingController
 from src.controllers.testing_controller import TestingController
 from src.controllers.file_controller import FileController
 from src.utils.config_loader import load_config
+import src.evaluation_api as evaluation_api
 
 def get_config(path):
     return load_config(path)
@@ -39,7 +40,7 @@ def get_generator(config, key='training'):
   
 def get_raw_generator(config, path):
     loader = get_raw_loader(config, path)
-    return RawDataGenerator(raw_loader)
+    return RawDataGenerator(loader)
 
 def get_new_model(config):
     model_controller = ModelController(config)
@@ -54,11 +55,12 @@ def get_trained_model(config, experiment_name):
     trained_model = model.load_weights(trained_model_path)
     return model
 
-def setup_experiment(experiment_name):
+def setup_experiment(experiment_name, config):
     file_controller = FileController(experiment_name)
     file_controller.create_experiment_dir()
     file_controller.create_assembly_directory()
     file_controller.create_report_directory()
+    file_controller.save_config(config)
 
 def discard_existing_training(experiment_name):
     file_controller = FileController(experiment_name)
@@ -103,6 +105,13 @@ def test(config, experiment_name, new_testing=False):
 
     for bacteria in config['testing']['bacteria']:
         name = bacteria['name']
-        generator = get_raw_generator(bacteria['data'])
+        generator = get_raw_generator(config, bacteria['data'])
         aligner = mp.Aligner(bacteria['reference'])
         controller.test(name, generator, aligner)
+
+def evaluate(experiment_name):
+    evaluation_api.plot_validation(experiment_name)
+    evaluation_api.plot_training(experiment_name)
+    evaluation_api.plot_testing(experiment_name)
+    evaluation_api.plot_testing_per_bacteria(experiment_name)
+    evaluation_api.make_report(experiment_name)

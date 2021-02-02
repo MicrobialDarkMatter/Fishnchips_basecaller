@@ -38,7 +38,7 @@ def get_user_input(ui_controller):
 
 def main(config_path, experiment_name):
     config = api.get_config(config_path)
-    api.setup_experiment(experiment_name)
+    api.setup_experiment(experiment_name, config)
 
     ui_controller = UIController(config, experiment_name)
     ui_controller = get_user_input(ui_controller)
@@ -48,11 +48,9 @@ def main(config_path, experiment_name):
     
     if ui_controller.skip_testing == False:
         api.test(config, experiment_name, ui_controller.new_testing)
+        api.evaluate(experiment_name)
 
 if __name__ == "__main__":
     args = parse_args()
     main(args.config, args.name)
     print(' - Script has finished successfully.')
-    
-    
-     

@@ -52,6 +52,6 @@ def verify_test_config(test_config, model_config):
 
     assert type(test_config['bacteria']) == list, 'Test bacteria must be a list.'
     for bacteria in test_config['bacteria']:
-        assert type(bacteria['name']) and len(bacteria['name'] > 0), f'Bacteria name must be a non-empty string.'
-        assert os.path.exists(bacteria['data']), f'Invalid bacteria data directory. {bacteria['data']} does not exist.'
-        assert os.path.exists(bacteria['reference']), f'Invalid bacteria reference filepath. {bacteria['reference']} does not exist.'
+        assert type(bacteria['name']) and len(bacteria['name']) > 0, f'Bacteria name must be a non-empty string.'
+        assert os.path.exists(bacteria['data']), f'Invalid bacteria data directory. {bacteria["data"]} does not exist.'
+        assert os.path.exists(bacteria['reference']), f'Invalid bacteria reference filepath. {bacteria["reference"]} does not exist.'

@@ -60,7 +60,7 @@ class TestingController():
         }
 
     def test(self, bacteria, generator, aligner):
-        print(' - Testing model.')
+        print(f' - Testing {bacteria}.')
         for i in range(self.reads):
             try:
                 x, read_id = next(generator.get_batched_read())
@@ -68,7 +68,7 @@ class TestingController():
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                    print(f"{i:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
+                    print(f"{i+1:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
                                        
                     y_batch_pred = self.inference_controller.predict_batch(x_batch, self.model)
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
