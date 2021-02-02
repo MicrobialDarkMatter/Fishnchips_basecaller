@@ -28,7 +28,7 @@ class EvaluationController():
         return counts
 
     def count_reads(self):
-        data = self.file_controller.load_evaluation()
+        data = self.file_controller.load_testing()
         return len(data)
 
     def count_reads_per_bacteria(self):
@@ -39,7 +39,7 @@ class EvaluationController():
         return counts
 
     def get_accuracy_list(self, include_unmatched=True):
-        data = self.file_controller.load_evaluation()
+        data = self.file_controller.load_testing()
         accuracy = []
         for measurement in data:
             if include_unmatched == False and measurement['cigacc'] == 0:
@@ -48,7 +48,7 @@ class EvaluationController():
         return accuracy
 
     def get_accuracy_list_per_bacteria(self, include_unmatched=True):
-        data = self.file_controller.load_evaluation()
+        data = self.file_controller.load_testing()
         accuracies = {}
         for measurement in data:
             key = measurement['bacteria']
@@ -73,7 +73,7 @@ class EvaluationController():
 
     def get_total_testing_time(self):
         total_time_seconds = 0
-        data = self.file_controller.load_evaluation()
+        data = self.file_controller.load_testing()
         for measurement in data:
             total_time_seconds += measurement['time']
         total_time_seconds = math.floor(total_time_seconds)

@@ -21,9 +21,7 @@ class TestingController():
         self.inference_controller = InferenceController()
 
         self.file_controller = FileController(experiment_name)
-        self.model_filepath = self.file_controller.get_model_filepath()
-        self.evaliation_filepath = self.file_controller.get_evaluation_filepath()
-        self.results = [] if new_testing else self.file_controller.load_evaluation()
+        self.results = [] if new_testing else self.file_controller.load_testing()
 
     def pretty_print_progress(self, start, end, total):
         progress_str = '['
@@ -82,7 +80,7 @@ class TestingController():
                 self.results.append(result)
 
                 print(f"{i:02d}/{self.reads} Done | CIG ACC: {result['cigacc']}"+" "*70) # 70 blanks to overwrite the previous print
-                self.file_controller.save_evaluation(self.results)
+                self.file_controller.save_testing(self.results)
             except Exception as e:
                 print(e)
                 traceback.print_exc()

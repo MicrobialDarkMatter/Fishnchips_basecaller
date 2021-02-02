@@ -56,4 +56,4 @@ def make_report(experiment_name):
         'total_testing_time':evaluation_controller.get_total_testing_time(),
         'total_training_time':evaluation_controller.get_total_training_time()
     }
-    file_controller.save_evaluation_report(report)
+    file_controller.save_evaluation(report)
