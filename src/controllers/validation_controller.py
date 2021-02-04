@@ -38,7 +38,7 @@ class ValidationController():
                     pred_str = convert_to_base_string(pred, skip_tokens=['S', 'E', 'P'])
                     true_str = convert_to_base_string(true, skip_tokens=['S', 'E', 'P'])
                     total_editdistance += editdistance.eval(pred_str, true_str)
-                average_editdistance = total_editdistance / self.batch_size
+                average_editdistance = total_editdistance / len(y_pred)
                 validation_loss += average_editdistance
                 performed += 1
             except Exception as e:
