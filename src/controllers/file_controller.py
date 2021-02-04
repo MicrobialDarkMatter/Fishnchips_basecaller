@@ -24,17 +24,20 @@ class FileController():
     def get_assembly_filepath(self, read_id, iteration, bacteria):
         return f'{self.get_assembly_directory_path()}/{iteration}_{bacteria}_{read_id}.txt'
 
+    def get_report_filepath(self):
+        return f'{self.path}/report'
+
     def get_validation_plot_filepath(self):
-        return f'{self.path}/report/validation.png'
+        return f'{self.get_report_filepath()}/validation.png'
 
     def get_training_plot_filepath(self):
-        return f'{self.path}/report/training.png'
+        return f'{self.get_report_filepath()}/training.png'
 
     def get_testing_plot_filepath(self, suffix):
-        return f'{self.path}/report/testing_{suffix}.png'
+        return f'{self.get_report_filepath()}/testing_{suffix}.png'
 
     def get_evaluation_filrpath(self):
-        return f'{self.path}/report/evaluation.json'
+        return f'{self.get_report_filepath()}/evaluation.json'
 
     def trained_model_exists(self):
         return os.path.exists(self.get_model_filepath())
@@ -105,8 +108,8 @@ class FileController():
     def save_config(self, config):
         with open(self.get_config_filepath(), 'w') as f:
             json.dump(config, f, indent=4)
-
-    def teardown_evaluation(self):
+            
+    def teardown_testing(self):
         path = self.get_testing_filepath()
         if os.path.exists(path):
             print(' ! Removing existing evaluation.')
@@ -124,6 +127,15 @@ class FileController():
             print(' ! Removing trained model.')
             os.remove(path)
         
+    def teardown_evaluation(self):
+        directory = self.get_report_filepath()
+        files = os.listdir(directory)
+        if files != []:
+            print(' ! Removing evaluation report')
+            for filename in files:
+                filepath = os.path.join(directory, filename)
+                os.remove(filepath)
+
     def teardown_assemblies(self):
         directory = self.get_assembly_directory_path()
         assembly_files = os.listdir(directory)

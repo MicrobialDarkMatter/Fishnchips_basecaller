@@ -39,8 +39,9 @@ def discard_existing_training(experiment_name):
 
 def discard_existing_testing(experiment_name):
     file_controller = FileController(experiment_name)
-    file_controller.teardown_evaluation()
+    file_controller.teardown_testing()
     file_controller.teardown_assemblies()   
+    file_controller.teardown_evaluation()
     
 def get_validation_controller(config):
     generator = data_api.get_generator(config, key='validation')
