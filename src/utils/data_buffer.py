@@ -52,6 +52,7 @@ class DataBuffer():
     def fill_buffer(self):
         found = 0
         while found < self.size:
+            print(' - - Filling buffer with 10 percent of new read.')
             i = self.position + found
             read_x, read_y = self.get_segmented_read(self.read_ids[i]) 
             read_x, read_y = self.shuffle(read_x, read_y)
