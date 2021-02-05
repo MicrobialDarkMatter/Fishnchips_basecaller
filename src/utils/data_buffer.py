@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 from collections import deque 
@@ -28,13 +29,17 @@ class DataBuffer():
             self.set_read_ids()
 
     def get_batch(self):
-        while len(self.label_windows) < self.batch_size:
-            self.fetch()
-            self.shuffle()
+        
+        if len(self.label_windows) < self.batch_size:
+            self.empty_buffer()
+            self.fill_buffer()
+            self.shuffle_buffer()
 
         x = np.array(self.signal_windows[:self.batch_size])
         y = np.array(self.label_windows[:self.batch_size])
-        self.drop()
+        self.signal_windows = self.signal_windows[self.batch_size+1:]
+        self.label_windows = self.label_windows[self.batch_size+1:] 
+        
         return x,y
 
     def get_batched_read(self):
@@ -44,32 +49,38 @@ class DataBuffer():
         self.set_position(increment=1)
         return np.array(read_x), np.array(read_y), list(ref), dacs, read_id
         
-    def fetch(self):        
-        skips, found = 0, 0
+    def fill_buffer(self):
+        found = 0
         while found < self.size:
-            i = self.position + skips + found
+            i = self.position + found
             read_x, read_y = self.get_segmented_read(self.read_ids[i]) 
-
-            self.signal_windows.extend(read_x)
-            self.label_windows.extend(read_y)
+            read_x, read_y = self.shuffle(read_x, read_y)
+            idx = math.floor(len(x) / 10)
+            self.signal_windows.extend(read_x[:idx])
+            self.label_windows.extend(read_y[:idx])
             found += 1      
-        self.set_position(increment=skips + found)  
+        self.set_position(increment=found)
 
-    def drop(self):
-        self.signal_windows = self.signal_windows[self.batch_size+1:]
-        self.label_windows = self.label_windows[self.batch_size+1:]                                                 
-
-    def shuffle(self):
+    def empty_buffer(self):
+        self.signal_windows = []
+        self.label_windows = []
+                                              
+    def shuffle_buffer(self):
         x = np.array(self.signal_windows)
         y = np.array(self.label_windows)
+        x_shuffled, y_shuffled = self.shuffle(x,y)
+        
+        self.signal_windows = x_shuffled.tolist()
+        self.label_windows = y_shuffled.tolist()
 
+    def shuffle(self, x, y):
+        assert len(x) == len(y)
         c = np.c_[x.reshape(len(x), -1), y.reshape(len(y), -1)]
         np.random.shuffle(c)
         x_shuffled = c[:, :x.size//len(x)].reshape(x.shape)
         y_shuffled = c[:, x.size//len(x):].reshape(y.shape)
-        
-        self.signal_windows = x_shuffled.tolist()
-        self.label_windows = y_shuffled.tolist()
+        return x_shuffled, y_shuffled
+
 
     def get_segmented_read(self, read_id):
         x_read = []
