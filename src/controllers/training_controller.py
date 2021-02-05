@@ -53,15 +53,16 @@ class TrainingController():
             batches = next(self.generator.get_batches(self.batches))
             for batch,(x,y) in enumerate(batches):
                 x = tf.constant(x, dtype=tf.float32)
-                y = tf.constant(y, dtype=tf.int32)
+                y = tf.constant(y, dtype=tf.int32)                
                 self.train_step(x, y)
                 print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
             print()
 
             current_validation_loss = self.validation_controller.validate(self.model)
-            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time()])
+            lr = self.get_current_learning_rate()
+            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
             self.file_controller.save_training(self.results)            
-            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs')
+            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
 
             if current_validation_loss < validation_loss:
                 waited = 0
@@ -103,3 +104,8 @@ class TrainingController():
             if validation_loss < min_validation_loss:
                 min_validation_loss = validation_loss
         return min_validation_loss
+
+    def get_current_learning_rate(self):
+        lr = self.optimizer._decayed_lr("float32").numpy()
+        return float(lr)
+
