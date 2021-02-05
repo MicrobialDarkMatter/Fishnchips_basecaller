@@ -59,9 +59,9 @@ class TrainingController():
             print()
 
             current_validation_loss = self.validation_controller.validate(self.model)
-            self.results.append([self.train_loss.result(), self.train_accuracy.result(), validation_loss, time.time()])
+            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time()])
             self.file_controller.save_training(self.results)            
-            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{validation_loss} | Took:{time.time() - start_time} secs')
+            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs')
 
             if current_validation_loss < validation_loss:
                 waited = 0
