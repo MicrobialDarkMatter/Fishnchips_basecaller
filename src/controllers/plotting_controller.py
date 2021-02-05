@@ -45,4 +45,12 @@ class PlottingController():
         plt.savefig(path)
         plt.close()     
 
-
+    def save_learning_rate_plot(self, lr, path):
+        plt.figure(figsize=(5,5))
+        plt.plot(lr, color=self.primary_color)
+        plt.title = 'Learning rate'
+        plt.subtitle = f'Experiment:{self.experiment_name}'
+        plt.xlabel('epoch')
+        plt.ylabel('learning rate')
+        plt.savefig(path)
+        plt.close()   
