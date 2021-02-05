@@ -16,9 +16,8 @@ def plot_validation(experiment_name):
         plotting_controller = PlottingController(experiment_name)
         plotting_controller.save_validation_plot(data, path)
     except Exception as e:
-        print_exception(' ! Unable to create validation plot.', e, trace=True)
+        print_exception(' ! Unable to create validation plot.', e, show_trance=True)
         
-
 def plot_training(experiment_name):
     try:
         file_controller = FileController(experiment_name)
@@ -30,7 +29,7 @@ def plot_training(experiment_name):
         plotting_controller = PlottingController(experiment_name)
         plotting_controller.save_training_plot(loss, acc, path)
     except Exception as e:
-        print_exception(' ! Unable to create training plot.', e, trace=True)
+        print_exception(' ! Unable to create training plot.', e, show_trance=True)
 
 def plot_testing(experiment_name):
     try:
@@ -41,7 +40,7 @@ def plot_testing(experiment_name):
         plotting_controller = PlottingController(experiment_name)
         plotting_controller.save_testing_plot(acc, path, title='all')
     except Exception as e:
-        print_exception(' ! Unable to create testing plot.', e, trace=True)
+        print_exception(' ! Unable to create testing plot.', e, show_trance=True)
  
 def plot_testing_per_bacteria(experiment_name):
     try:
@@ -54,7 +53,7 @@ def plot_testing_per_bacteria(experiment_name):
             path = file_controller.get_testing_plot_filepath(suffix=bacteria)
             plotting_controller.save_testing_plot(acc, path, title=bacteria)
     except Exception as e:
-        print_exception(' ! Unable to create testing plot per bacteria.', e, trace=True)
+        print_exception(' ! Unable to create testing plot per bacteria.', e, show_trance=True)
 
 def plot_learning_rate(experiment_name):
     try:
@@ -66,7 +65,7 @@ def plot_learning_rate(experiment_name):
         plotting_controller = PlottingController(experiment_name)
         plotting_controller.save_learning_rate_plot(lr, path)
     except Exception as e:
-        print_exception(' ! Unable to create learning rate plot.', e, trace=True)
+        print_exception(' ! Unable to create learning rate plot.', e, show_trance=True)
 
 def make_report(experiment_name):
     try:
@@ -81,8 +80,10 @@ def make_report(experiment_name):
             'unmatched_reads':evaluation_controller.count_unmatched_reads(),
             'unmatched_reads_per_bacteria':evaluation_controller.count_unmatched_reads_per_bacteria(),
             'total_testing_time':evaluation_controller.get_total_testing_time(),
-            'total_training_time':evaluation_controller.get_total_training_time()
+            'total_training_time':evaluation_controller.get_total_training_time(),
+            'SMDI':evaluation_controller.get_SMDI(),
+            'SMDI_per_bacteria':evaluation_controller.get_SMDI_per_bacteria()
         }
         file_controller.save_evaluation(report)
     except Exception as e:
-        print_exception(' ! Unable to create evaluation report.', e, trace=True)
+        print_exception(' ! Unable to create evaluation report.', e, show_trance=True)

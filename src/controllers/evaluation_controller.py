@@ -1,3 +1,4 @@
+import re
 import math
 import datetime
 import numpy as np
@@ -103,4 +104,44 @@ class EvaluationController():
                 min_validation_loss = validation_loss
                 min_validation_idx = i
         return min_validation_loss, min_validation_idx
-    
+
+    def get_SMDI(self):
+        data = self.file_controller.load_testing()
+        smdi_dict = {"S":0,"M":0,"D":0,"I":0}
+        total_length = 0
+        for measurement in data:
+            if measurement['cigacc'] == 0:
+                continue
+            total_length += measurement['blen']
+            cigar_string = measurement['cig']
+            result = re.findall(r'[\d]+[SMDI]', cigar_string) #[6M, 5D, ...]
+            for r in result:
+                amount = int(r[:-1]) # 6
+                key = r[-1] # M
+                smdi_dict[key] += amount
+        for key in 'SMDI':
+            smdi_dict[key] /= total_length 
+        return smdi_dict
+
+    def get_SMDI_per_bacteria(self):
+        data = self.file_controller.load_testing()
+        smdi_dicts = {}
+        lenghts = {}
+        for measurement in data:
+            if measurement['cigacc'] == 0:
+                continue
+            bacteria = measurement['bacteria']
+            if bacteria not in smdi_dicts.keys():
+                smdi_dicts[bacteria] = {"S":0,"M":0,"D":0,"I":0}
+                lenghts[bacteria] = 0
+            lenghts[bacteria] += measurement['blen']
+            cigar_string = measurement['cig']
+            result = re.findall(r'[\d]+[SMDI]', cigar_string) 
+            for r in result:
+                amount = int(r[:-1])
+                key = r[-1]
+                smdi_dicts[bacteria][key] += amount
+        for bacteria in smdi_dicts.keys():
+            for key in 'SMDI':
+                smdi_dicts[bacteria][key] /= lenghts[bacteria]
+        return smdi_dicts

@@ -78,7 +78,7 @@ class FileController():
             print(f' ! Error occured when creating experiment report directory. Path: {report_path}')    
 
     def load_testing(self):
-        assert self.testing_result_exists(), f'Evaluation was requested, but {self.get_testing_filepath()} does not exist.'
+        assert self.testing_result_exists(), f'Testing was requested, but {self.get_testing_filepath()} does not exist.'
         with open(self.get_testing_filepath(), 'r') as f:
             return json.load(f)
 

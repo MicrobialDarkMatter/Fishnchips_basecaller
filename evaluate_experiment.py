@@ -1,10 +1,5 @@
-import matplotlib.pyplot as plt
-from matplotlib import pyplot
-import numpy as np
-import math
-import src.evaluation_api as eval_api
 import argparse
-import os
+import src.api as api
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -14,11 +9,8 @@ def parse_args():
     return args  
 
 def main(experiment_name):
-    eval_api.plot_validation(experiment_name)
-    eval_api.plot_training(experiment_name)
-    eval_api.plot_testing(experiment_name)
-    eval_api.plot_testing_per_bacteria(experiment_name)
-    eval_api.make_report(experiment_name)
+    api.discard_existing_evaluation(experiment_name)
+    api.evaluate(experiment_name)
 
 if __name__ == "__main__":
     args = parse_args()
