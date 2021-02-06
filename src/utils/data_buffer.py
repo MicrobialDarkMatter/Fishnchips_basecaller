@@ -29,7 +29,6 @@ class DataBuffer():
             self.set_read_ids()
 
     def get_batch(self):
-        
         if len(self.label_windows) < self.batch_size:
             self.empty_buffer()
             self.fill_buffer()
@@ -52,14 +51,15 @@ class DataBuffer():
     def fill_buffer(self):
         found = 0
         while found < self.size:
-            print(' - - Filling buffer with 10 percent of new read.')
+            print(f' - - {found + 1}/{self.size} Filling buffer with 50 percent of new read.', end='\r')
             i = self.position + found
             read_x, read_y = self.get_segmented_read(self.read_ids[i]) 
             read_x, read_y = self.shuffle(read_x, read_y)
-            idx = math.floor(len(x) / 10)
+            idx = math.floor(len(read_x) / 2)
             self.signal_windows.extend(read_x[:idx])
             self.label_windows.extend(read_y[:idx])
             found += 1      
+        print()
         self.set_position(increment=found)
 
     def empty_buffer(self):
@@ -67,20 +67,20 @@ class DataBuffer():
         self.label_windows = []
                                               
     def shuffle_buffer(self):
-        x = np.array(self.signal_windows)
-        y = np.array(self.label_windows)
+        x = self.signal_windows
+        y = self.label_windows
         x_shuffled, y_shuffled = self.shuffle(x,y)
-        
-        self.signal_windows = x_shuffled.tolist()
-        self.label_windows = y_shuffled.tolist()
+        self.signal_windows = x_shuffled
+        self.label_windows = y_shuffled
 
     def shuffle(self, x, y):
+        x,y = np.array(x), np.array(y)
         assert len(x) == len(y)
         c = np.c_[x.reshape(len(x), -1), y.reshape(len(y), -1)]
         np.random.shuffle(c)
         x_shuffled = c[:, :x.size//len(x)].reshape(x.shape)
         y_shuffled = c[:, x.size//len(x):].reshape(y.shape)
-        return x_shuffled, y_shuffled
+        return x_shuffled.tolist(), y_shuffled.tolist()
 
 
     def get_segmented_read(self, read_id):

@@ -8,9 +8,11 @@ class DataGenerator():
     def get_batches(self, amount):
         while True:
             batches = []
-            for _ in range(amount):
+            for i in range(amount):
+                print(f' - - Fetching {i+1}/{amount} batches.', end='\r')
                 x,y = next(self.get_batch())
                 batches.append([x,y])
+            print()
             yield batches
         
     def get_batch(self):
