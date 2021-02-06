@@ -36,6 +36,9 @@ class FileController():
     def get_testing_plot_filepath(self, suffix):
         return f'{self.get_report_filepath()}/testing_{suffix}.png'
 
+    def get_learning_rate_plot_filepath(self):
+        return f'{self.get_report_filepath()}/learning_rate.png'
+
     def get_evaluation_filrpath(self):
         return f'{self.get_report_filepath()}/evaluation.json'
 

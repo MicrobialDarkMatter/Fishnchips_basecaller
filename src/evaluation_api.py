@@ -58,7 +58,7 @@ def plot_testing_per_bacteria(experiment_name):
 def plot_learning_rate(experiment_name):
     try:
         file_controller = FileController(experiment_name)
-        path = file_controller.get_training_plot_filepath()
+        path = file_controller.get_learning_rate_plot_filepath()
         data = file_controller.load_training()
         data = np.array(data)
         lr = data[:,4]

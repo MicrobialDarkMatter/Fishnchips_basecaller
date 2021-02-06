@@ -89,4 +89,5 @@ def evaluate(experiment_name):
     evaluation_api.plot_training(experiment_name)
     evaluation_api.plot_testing(experiment_name)
     evaluation_api.plot_testing_per_bacteria(experiment_name)
+    evaluation_api.plot_learning_rate(experiment_name)
     evaluation_api.make_report(experiment_name)
