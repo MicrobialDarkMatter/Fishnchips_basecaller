@@ -23,14 +23,17 @@ class TestingController():
         self.results = [] if new_testing else self.file_controller.load_testing()
 
     def pretty_print_progress(self, start, end, total):
-        progress_str = '['
-        for i in range(0, total, total//50):
-            if i >= start and i < end:
-                progress_str += 'x'
-            else:
-                progress_str += '-'
-        progress_str += ']'
-        return progress_str
+        try:
+            progress_str = '['
+            for i in range(0, total, max(total//50, 1)):
+                if i >= start and i < end:
+                    progress_str += 'x'
+                else:
+                    progress_str += '-'
+            progress_str += ']'
+            return progress_str
+        except:
+            return '[ Failed to get progress string ]'
 
     def get_assembly(self, y_pred, iteration, read_id, bacteria):
         if self.use_assembler == False:
@@ -68,7 +71,8 @@ class TestingController():
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                    print(f"{i+1:02d}/{self.reads:02d} Predicting windows {self.pretty_print_progress(b, b+len(x_batch), len(x))} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
+                    progress_bar = self.pretty_print_progress(b, b+len(x_batch), len(x))
+                    print(f"{i+1:02d}/{self.reads:02d} Predicting batch {progress_bar} {b:04d}-{b+len(x_batch):04d}/{len(x):04d}", end="\r")
                                        
                     y_batch_pred = self.inference_controller.predict_batch(x_batch, self.model)
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
