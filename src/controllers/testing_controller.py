@@ -17,6 +17,7 @@ class TestingController():
         self.batch_size = test_config['batch_size']
 
         self.use_assembler = test_config['signal_window_stride'] < model_config['signal_window_size']
+        self.save_predictions = test_config['save_predictions']
         self.inference_controller = InferenceController()
 
         self.file_controller = FileController(experiment_name)
@@ -49,6 +50,11 @@ class TestingController():
         except:
             return self.get_result_dict(read_id, bacteria, 0, 0, 0, 0, 0, 0, 0)
 
+    def save_prediction(self, prediction_str, bacteria, read_id, iteration):
+        if self.save_predictions == False:
+            return
+        self.file_controller.save_prediction(prediction_str, bacteria, read_id, iteration)
+
     def get_result_dict(self, read_id, bacteria, ctg, r_st, r_en, nm, blen, cig, cigacc):
         return {
             'read_id':read_id,
@@ -79,6 +85,8 @@ class TestingController():
                     y_pred.extend(y_batch_pred_strings)
                 
                 assembly = self.get_assembly(y_pred, i, read_id, bacteria)
+                self.save_prediction(assembly, bacteria, read_id, i)
+                
                 result = self.get_result(assembly, aligner, read_id, bacteria)
                 result['time'] = time.time() - start_time
                 self.results.append(result)

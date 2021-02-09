@@ -8,11 +8,15 @@ def load_config(path):
     return config
 
 def verify_config(config):
-    verify_model_config(config['model'])
-    verify_train_config(config['training'], config['model'])
-    vefify_validation_config(config['validation'], config['model'])
-    verify_test_config(config['testing'], config['model'])
-    print(' - Config was successfully loaded.')
+    try:
+        verify_model_config(config['model'])
+        verify_train_config(config['training'], config['model'])
+        vefify_validation_config(config['validation'], config['model'])
+        verify_test_config(config['testing'], config['model'])
+        print(' - Config was successfully loaded.')
+    except Exception as e:
+        print(e)
+        print(' ! Config verification has failed.')
 
 def verify_model_config(model_config):
     assert type(model_config['signal_window_size']) == int and model_config['signal_window_size'] > 0, 'Max length of Encoder must be a positive integer. It corresponds to input signal window size.'
@@ -49,6 +53,7 @@ def verify_test_config(test_config, model_config):
     assert type(test_config['buffer_size']) == int and test_config['buffer_size'] > 0, 'Test buffer size must be a positive integer.'
     assert type(test_config['signal_window_stride']) == int and test_config['signal_window_stride'] > 0 and test_config['signal_window_stride'] <= model_config['signal_window_size'], 'Test signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
     assert type(test_config['reads']) == int and test_config['reads'] > 0, 'Number of reads to test must be a positive integer.'
+    assert type(test_config['save_predictions'] == bool), 'Save prediction flag must be a boolean value.'
 
     assert type(test_config['bacteria']) == list, 'Test bacteria must be a list.'
     for bacteria in test_config['bacteria']:

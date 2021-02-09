@@ -21,8 +21,14 @@ class FileController():
     def get_assembly_directory_path(self):
         return f'{self.path}/assemblies'
 
+    def get_prediction_directory_path(self):
+        return f'{self.path}/predictions'
+
     def get_assembly_filepath(self, read_id, iteration, bacteria):
         return f'{self.get_assembly_directory_path()}/{iteration}_{bacteria}_{read_id}.txt'
+
+    def get_prediction_filepath(self, reads_id, iteration, bacteria):
+        return f'{get_prediction_directory_path()}/{iteration}_{bacteria}_{read_id}.fasta'
 
     def get_report_filepath(self):
         return f'{self.path}/report'
@@ -68,7 +74,17 @@ class FileController():
             os.makedirs(assembly_path)
         except Exception as e:
             print(e)
-            print(f' ! Error occured when creating experiment assembly directory. Path: {assembly_path}')    
+            print(f' ! Error occured when creating experiment assembly directory. Path: {assembly_path}')  
+
+    def create_prediction_directory(self):
+        try:
+            prediction_path = self.get_prediction_directory_path()
+            if os.path.exists(prediction_path):
+                return 
+            os.makedirs(prediction_path)
+        except Exception as e:
+            print(e)
+            print(f' ! Error occured when creating experiment prediction directory. Path: {prediction_path}')     
 
     def create_report_directory(self):
         try:
@@ -111,7 +127,12 @@ class FileController():
     def save_config(self, config):
         with open(self.get_config_filepath(), 'w') as f:
             json.dump(config, f, indent=4)
-            
+
+    def save_prediction(self, prediction_str, bacteria, read_id, iteration):
+        with open(self.get_prediction_filepath(read_id, iteration, bacteria)) as f:
+            f.write(f'>{read_id}\n')
+            f.write(prediction_str)
+
     def teardown_testing(self):
         path = self.get_testing_filepath()
         if os.path.exists(path):

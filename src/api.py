@@ -30,6 +30,7 @@ def setup_experiment(experiment_name, config):
     file_controller.create_experiment_dir()
     file_controller.create_assembly_directory()
     file_controller.create_report_directory()
+    file_controller.create_prediction_directory()
     file_controller.save_config(config)
 
 def discard_existing_training(experiment_name):

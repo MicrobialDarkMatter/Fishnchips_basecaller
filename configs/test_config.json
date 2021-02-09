@@ -33,6 +33,7 @@
         "batch_size":30,
         "buffer_size":5,
         "signal_window_stride":30,
+        "save_predictions":true,
         "reads":3,
         "bacteria":[
             {
