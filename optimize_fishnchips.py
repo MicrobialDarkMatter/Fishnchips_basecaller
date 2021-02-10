@@ -10,17 +10,12 @@ from src.utils.data_generator import DataGenerator
 from src.model.Attention.CustomSchedule import CustomSchedule
 from src.model.Attention.attention_utils import create_combined_mask
 
-wandb.login()
-with open('./configs/sweeps.yaml', 'r') as f:
-    sweep_config = yaml.load(f, Loader=yaml.FullLoader)
-
-sweep_id = wandb.sweep(sweep_config, project="fnch sweep demo")
-wandb.agent(sweep_id, train, count=5)
-
-
 def train(config=None):
     with wandb.init(config=config):
         config = wandb.config
+
+        print(config)
+        return 
         model_config = build_model_config_from_wandb(config)
         model = api.get_new_model(model_config)
         generator = build_generator(config)
@@ -73,3 +68,10 @@ def build_generator(wandb_config):
     buffer = DataBuffer(loader, buffer_size=5, batch_size=32, signal_window_size=wandb_config.signal_window_size, signal_window_stride=wandb_config.signal_window_size // 3)
     generator = DataGenerator(buffer, label_window_size = wandb_config.signal_window_size // 3)
     return generator
+
+wandb.login()
+with open('./configs/sweeps.yaml', 'r') as f:
+    sweep_config = yaml.load(f, Loader=yaml.FullLoader)
+
+sweep_id = wandb.sweep(sweep_config, project="fnch sweep demo")
+wandb.agent(sweep_id, train, count=5)
