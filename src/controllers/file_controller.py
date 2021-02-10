@@ -28,7 +28,7 @@ class FileController():
         return f'{self.get_assembly_directory_path()}/{iteration}_{bacteria}_{read_id}.txt'
 
     def get_prediction_filepath(self, reads_id, iteration, bacteria):
-        return f'{get_prediction_directory_path()}/{iteration}_{bacteria}_{read_id}.fasta'
+        return f'{self.get_prediction_directory_path()}/{iteration}_{bacteria}_{read_id}.fasta'
 
     def get_report_filepath(self):
         return f'{self.path}/report'
