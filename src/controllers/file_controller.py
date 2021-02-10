@@ -129,7 +129,7 @@ class FileController():
             json.dump(config, f, indent=4)
 
     def save_prediction(self, prediction_str, bacteria, read_id, iteration):
-        with open(self.get_prediction_filepath(read_id, iteration, bacteria)) as f:
+        with open(self.get_prediction_filepath(read_id, iteration, bacteria), 'w') as f:
             f.write(f'>{read_id}\n')
             f.write(prediction_str)
 
