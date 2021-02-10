@@ -14,8 +14,6 @@ def train(config=None):
     with wandb.init(config=config):
         config = wandb.config
 
-        print(config)
-        return 
         model_config = build_model_config_from_wandb(config)
         model = api.get_new_model(model_config)
         generator = build_generator(config)
