@@ -1,0 +1,15 @@
+program: optimize_fishnchips.py
+method: random
+metric:
+  goal: minimize
+  name: loss
+parameters:
+  signal_window_size: [300,600,900,1200]
+  attention_blocks: [4,6,8,10]
+  cnn_blocks: [2, 5, 7]
+  dff: [256, 512, 1024]
+  num_heads: [5, 10, 15, 20, 25]
+  dropout_rate: [0.1, 0.15, 0.2]
+  maxpool_kernel: [2, 4, 6]
+  epochs:
+    value: 1
