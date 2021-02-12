@@ -34,7 +34,7 @@ def train(config=None):
                 for batch,(x,y) in enumerate(batches):
                     x = tf.constant(x, dtype=tf.float32)
                     y = tf.constant(y, dtype=tf.int32)                
-                    loss = train_step(x, y, model, loss_object)
+                    loss, optimizer = train_step(x, y, model, loss_object, optimizer)
                     train_loss(loss)
                     print (f' - - Epoch:{epoch+1}/{config.epochs} | Batch:{batch+1}/{no_batches} | Loss:{train_loss.result():.4f}', end="\r")
                 print()
@@ -50,7 +50,7 @@ def train(config=None):
         print('Error during trainig.')
 
 @tf.function
-def train_step(x, y, model, loss_object):
+def train_step(x, y, model, loss_object, optimizer):
     y_input = y[:, :-1]
     y_label = y[:, 1:]
     combined_mask = create_combined_mask(y_input) 
@@ -60,7 +60,7 @@ def train_step(x, y, model, loss_object):
         loss = model.get_loss(y_label, y_prediction, loss_object)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return loss
+    return loss, optimizer
 
 def build_model_config_from_wandb(wandb_config):
     return {
