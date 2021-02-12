@@ -50,7 +50,7 @@ def train(config=None):
         print('Error during trainig.')
 
 @tf.function
-def train_step(self, x, y, model, loss_object):
+def train_step(x, y, model, loss_object):
     y_input = y[:, :-1]
     y_label = y[:, 1:]
     combined_mask = create_combined_mask(y_input) 
