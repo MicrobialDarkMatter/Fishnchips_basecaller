@@ -29,13 +29,18 @@ def train(config=None):
 
             for epoch in range(config.epochs):
                 train_loss.reset_states()
-                batches = next(generator.get_batches(3000))
+                no_batches = 3000
+                batches = next(generator.get_batches(no_batches))
                 for batch,(x,y) in enumerate(batches):
                     x = tf.constant(x, dtype=tf.float32)
                     y = tf.constant(y, dtype=tf.int32)                
                     loss = train_step(x, y, model, loss_object)
                     train_loss(loss)
-                    wandb.log({"loss": train_loss.result(), "epoch": epoch+1})
+                    print (f' - - Epoch:{epoch+1}/{config.epochs} | Batch:{batch+1}/{no_batches} | Loss:{train_loss.result():.4f}', end="\r")
+                print()
+                print (f' = = Epoch:{epoch+1}/{config.epochs} | Loss:{train_loss.result():.4f}')
+
+                wandb.log({"loss": train_loss.result(), "epoch": epoch+1})
     except Exception as e:
         print()
         print(50*'-')
