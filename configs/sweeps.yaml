@@ -13,7 +13,7 @@ parameters:
   dff: 
     values: [256, 512, 1024]
   num_heads: 
-    values: [5, 10, 15, 20, 25]
+    values: [5, 10, 25]
   dropout_rate: 
     values: [0.1, 0.15, 0.2]
   maxpool_kernel: 

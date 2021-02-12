@@ -1,5 +1,6 @@
 import wandb
 import yaml
+import traceback 
 import src.api as api
 import src.data_api as data_api
 import tensorflow as tf
@@ -11,28 +12,37 @@ from src.model.Attention.CustomSchedule import CustomSchedule
 from src.model.Attention.attention_utils import create_combined_mask
 
 def train(config=None):
-    with wandb.init(config=config):
-        config = wandb.config
+    try:
+        with wandb.init(config=config):
+            config = wandb.config
 
-        model_config = build_model_config_from_wandb(config)
-        model = api.get_new_model(model_config)
-        generator = build_generator(config)
+            model_config = build_model_config_from_wandb(config)
+            model = api.get_new_model({'model':model_config})
+            generator = build_generator(config)
 
-        learning_rate = CustomSchedule(model_config['d_model']*training_config['lr_mult'])
-        optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+            lr_multiplier = 100
+            learning_rate = CustomSchedule(model_config['d_model']*lr_multiplier)
+            optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
-        train_loss = tf.keras.metrics.Mean(name='train_loss')
-        loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none')
+            train_loss = tf.keras.metrics.Mean(name='train_loss')
+            loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none')
 
-        for epoch in range(config.epochs):
-            train_loss.reset_states()
-            batches = next(generator.get_batches(3000))
-            for batch,(x,y) in enumerate(batches):
-                x = tf.constant(x, dtype=tf.float32)
-                y = tf.constant(y, dtype=tf.int32)                
-                loss = train_step(x, y, model, loss_object)
-                train_loss(loss)
-                wandb.log({"loss": train_loss.result(), "epoch": epoch+1})
+            for epoch in range(config.epochs):
+                train_loss.reset_states()
+                batches = next(generator.get_batches(3000))
+                for batch,(x,y) in enumerate(batches):
+                    x = tf.constant(x, dtype=tf.float32)
+                    y = tf.constant(y, dtype=tf.int32)                
+                    loss = train_step(x, y, model, loss_object)
+                    train_loss(loss)
+                    wandb.log({"loss": train_loss.result(), "epoch": epoch+1})
+    except Exception as e:
+        print()
+        print(50*'-')
+        traceback.print_exc()
+        print(50*'-')
+        print(e)
+        print('Error during trainig.')
 
 @tf.function
 def train_step(self, x, y, model, loss_object):
@@ -56,9 +66,9 @@ def build_model_config_from_wandb(wandb_config):
         'd_model': 250,
         'num_heads':wandb_config.num_heads,
         'dff':wandb_config.dff,
-        'pe_encoder_max_length':wandb_config.signal_window_size,
-        'pe_decoder_max_length':wandb_config.signal_window_size // 3,
-        'rate':wandb_config.dropout_rate
+        'signal_window_size':wandb_config.signal_window_size,
+        'label_window_size':wandb_config.signal_window_size // 3,
+        'dropout_rate':wandb_config.dropout_rate
     }
 
 def build_generator(wandb_config):
