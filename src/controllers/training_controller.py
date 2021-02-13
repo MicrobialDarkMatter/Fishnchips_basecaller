@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import wandb
 import time
 import math
 import sys
@@ -55,26 +56,28 @@ class TrainingController():
                 x = tf.constant(x, dtype=tf.float32)
                 y = tf.constant(y, dtype=tf.int32)                
                 self.train_step(x, y)
+                wandb.log({"batch loss": self.train_loss.result()})
                 print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
             print()
 
-            current_validation_loss = self.validation_controller.validate(self.model)
-            lr = self.get_current_learning_rate()
-            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
-            self.file_controller.save_training(self.results)            
-            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
+            # current_validation_loss = self.validation_controller.validate(self.model)
+            # lr = self.get_current_learning_rate()
+            # self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
+            # self.file_controller.save_training(self.results)            
+            wandb.log({"loss": self.train_loss.result(), "epoch": epoch+1})
+            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}')
 
-            if current_validation_loss < validation_loss:
-                waited = 0
-                validation_loss = current_validation_loss
-                print(' - - Model validation accuracy improvement - saving model weights.')
-                self.file_controller.save_model(self.model)                
-                model_weights = self.model.get_weights()
-            else:
-                waited += 1
-                if waited > self.patience:
-                    print(f' - Stopping training ( out of patience - model has not improved for {self.patience} epochs.')
-                    break
+            # if current_validation_loss < validation_loss:
+            #     waited = 0
+            #     validation_loss = current_validation_loss
+            #     print(' - - Model validation accuracy improvement - saving model weights.')
+            #     self.file_controller.save_model(self.model)                
+            #     model_weights = self.model.get_weights()
+            # else:
+            #     waited += 1
+            #     if waited > self.patience:
+            #         print(f' - Stopping training ( out of patience - model has not improved for {self.patience} epochs.')
+            #         break
             
         self.model.set_weights(model_weights)
         return self.model
