@@ -12,4 +12,5 @@ trained_models/*
 
 temps
 scripts
+wandb
 _my_model_backup
