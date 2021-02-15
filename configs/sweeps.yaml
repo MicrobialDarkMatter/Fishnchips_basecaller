@@ -1,22 +1,25 @@
 program: optimize_fishnchips.py
-method: random
+method: bayes
 metric:
   goal: minimize
   name: loss
 parameters:
   signal_window_size: 
-    values: [300,600,900,1200]
+    values: [300, 420, 510]
   attention_blocks: 
-    values: [4,6,8,10]
+    values: [1,2,3,4,5]
   cnn_blocks: 
-    values: [2, 5, 7]
+    values: [5,6,7]
   dff: 
-    values: [256, 512, 1024]
+    value: 512  
   num_heads: 
-    values: [5, 10, 25]
-  dropout_rate: 
-    values: [0.1, 0.15, 0.2]
+    values: [2, 4, 8]
+  dropout_rate: {
+    distribution: uniform,
+    min: 0.15,
+    max: 0.25
+  }
   maxpool_kernel: 
-    values: [2, 4, 6]
+    values: [4,6]
   epochs:
     value: 1
