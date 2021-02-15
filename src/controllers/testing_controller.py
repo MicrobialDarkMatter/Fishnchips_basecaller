@@ -46,22 +46,24 @@ class TestingController():
         try:
             besthit = next(aligner.map(assembly))
             cigacc = 1-(besthit.NM/besthit.blen)
-            return self.get_result_dict(read_id, bacteria, besthit.ctg, besthit.r_st, besthit.r_en, besthit.NM, besthit.blen, besthit.cigar_str, cigacc)
+            return self.get_result_dict(read_id, bacteria, besthit.ctg, besthit.r_st, besthit.r_en, besthit.q_st, besthit.q_en, besthit.NM, besthit.blen, besthit.cigar_str, cigacc)
         except:
-            return self.get_result_dict(read_id, bacteria, 0, 0, 0, 0, 0, 0, 0)
+            return self.get_result_dict(read_id, bacteria, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     def save_prediction(self, prediction_str, bacteria, read_id, iteration):
         if self.save_predictions == False:
             return
         self.file_controller.save_prediction(prediction_str, bacteria, read_id, iteration)
 
-    def get_result_dict(self, read_id, bacteria, ctg, r_st, r_en, nm, blen, cig, cigacc):
+    def get_result_dict(self, read_id, bacteria, ctg, r_st, r_en, q_st, q_en, nm, blen, cig, cigacc):
         return {
             'read_id':read_id,
             'bacteria':bacteria,
             'ctg': ctg,
             'r_st': r_st,
             'r_en': r_en,
+            'q_st': q_st,
+            'q_en': q_en,
             'NM': nm,
             'blen': blen,
             'cig': cig,

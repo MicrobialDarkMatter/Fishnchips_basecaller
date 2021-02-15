@@ -37,10 +37,14 @@ reference_filepath = get_referece_filepath(bacteria)
 prediction = load_fasta_sequence(prediction_filepath)
 reference = load_fasta_sequence(reference_filepath)
 cigar, s_idx, e_idx = load_cigar_string(read_id, experiment_name)
-print(len(prediction))
-print(len(reference))
-print(len(cigar))
+
+aligned_reference = reference[s_idx:e_idx]
+
+
+# print(len(prediction))
+# print(len(reference))
+# print(len(cigar))
 
 print(prediction[:20])
-print(reference[:20])
+print(aligned_reference[:20])
 print(cigar[:20])
