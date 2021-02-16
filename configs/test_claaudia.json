@@ -34,6 +34,7 @@
         "buffer_size":5,
         "signal_window_stride":300,
         "reads":5,
+        "save_predictions":false,
         "bacteria":[
             {
                 "name":"Haemophilus_haemolyticus_M1C132_1",
