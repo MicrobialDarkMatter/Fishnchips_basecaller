@@ -85,14 +85,17 @@ class TestingController():
                     y_pred.extend(y_batch_pred_strings)
                 
                 assembly = self.get_assembly(y_pred, i, read_id, bacteria)
-                self.save_prediction(assembly, bacteria, read_id, i)
+                # self.save_prediction(assembly, bacteria, read_id, i)
                 
                 result = self.get_result(assembly, aligner, read_id, bacteria)
-                result['time'] = time.time() - start_time
-                self.results.append(result)
+                # result['time'] = time.time() - start_time
+                # self.results.append(result)
+
+
+                wandb.log({"read_id": result['read_id'], "bacteria":result['bacteria'], "cigacc":result['cigacc']})
 
                 print(f"{i:02d}/{self.reads} Done | CIG ACC: {result['cigacc']}"+" "*70) # 70 blanks to overwrite the previous print
-                self.file_controller.save_testing(self.results)
+                # self.file_controller.save_testing(self.results)
             except Exception as e:
                 print(e)
                 traceback.print_exc()
