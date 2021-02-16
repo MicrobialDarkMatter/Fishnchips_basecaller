@@ -1,6 +1,7 @@
 import time
 import traceback 
 import mappy as mp
+import wandb
 
 from src.utils.base_converter import convert_to_base_strings
 from src.utils.assembler import assemble_and_output
