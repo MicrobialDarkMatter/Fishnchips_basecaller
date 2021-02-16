@@ -33,13 +33,8 @@
         "batch_size":300,
         "buffer_size":5,
         "signal_window_stride":300,
-        "reads":2,
+        "reads":5,
         "bacteria":[
-            {
-                "name":"Acinetobacter_pittii_16-377-0801",
-                "data":"./data/sample_test_data/Acinetobacter_pittii_16-377-0801",
-                "reference":"./data/sample_test_data/Acinetobacter_pittii_16-377-0801/reference.fasta"
-            },
             {
                 "name":"Haemophilus_haemolyticus_M1C132_1",
                 "data":"./data/sample_test_data/Haemophilus_haemolyticus_M1C132_1",
