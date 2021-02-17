@@ -49,7 +49,7 @@ def test(config=None):
 def build_model_config_from_wandb(wandb_config, fnch_config):
     fnch_config['model']['signal_window_size'] = wandb_config.signal_window_size
     fnch_config['model']['label_window_size'] = wandb_config.signal_window_size // 3
-    fnch_config['testing']['signal_window_stride'] = wandb_config.signal_window_size // 3
+    fnch_config['testing']['signal_window_stride'] = wandb_config.signal_window_size
     fnch_config['testing']['batch_size'] = 90000 // wandb_config.signal_window_size
     return fnch_config
 

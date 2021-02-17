@@ -33,14 +33,9 @@
         "batch_size":300,
         "buffer_size":5,
         "signal_window_stride":300,
-        "reads":5,
+        "reads":3,
         "save_predictions":false,
         "bacteria":[
-            {
-                "name":"Haemophilus_haemolyticus_M1C132_1",
-                "data":"./data/sample_test_data/Haemophilus_haemolyticus_M1C132_1",
-                "reference":"./data/sample_test_data/Haemophilus_haemolyticus_M1C132_1/reference.fasta"
-            },
             {
                 "name":"Klebsiella_pneumoniae_INF032",
                 "data":"./data/sample_test_data/Klebsiella_pneumoniae_INF032",

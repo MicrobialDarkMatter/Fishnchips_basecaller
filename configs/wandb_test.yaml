@@ -5,4 +5,4 @@ metric:
   name: error
 parameters:
   signal_window_size: 
-    values: [300, 600, 1200, 2400, 4800]
+    values: [600, 1200, 2400, 4800, 9600]
