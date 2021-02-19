@@ -23,7 +23,7 @@ class FishNChips(tf.keras.Model):
     def call(self, inp, tar, training, look_ahead_mask, use_cached_enc_ouput=False):
         x = self.first_cnn(inp) # to bring to proper dimensionality
         x = self.call_cnn_blocks(x, training) # won't do anything if no cnn blocks
-        att_output, att_weights = self.transformer(x, tar, training, look_ahead_mask, use_cached_enc_ouput, rate)
+        att_output, att_weights = self.transformer(x, tar, training, look_ahead_mask, use_cached_enc_ouput)
         return att_output, att_weights
 
     def call_cnn_blocks(self, x, training):
