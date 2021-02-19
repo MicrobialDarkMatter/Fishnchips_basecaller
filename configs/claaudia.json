@@ -1,14 +1,14 @@
 {
     "model":{
-        "signal_window_size": 300,
-        "label_window_size": 100,
-        "attention_blocks": 4,
-        "cnn_blocks": 5,
-        "maxpool_idx": 3,
-        "d_model": 250,
+        "signal_window_size": 1200,
+        "label_window_size": 400,
+        "attention_blocks": 5,
+        "cnn_blocks": 7,
+        "maxpool_idx": 5,
+        "d_model": 512,
         "dff": 512,
-        "num_heads": 25,
-        "dropout_rate": 0.1,
+        "num_heads": 8,
+        "dropout_rate": 0.25,
         "maxpool_kernel": 6
     },
     "training":{
@@ -17,22 +17,23 @@
         "warmup":100, 
         "patience": 300,
         "batches":3000,
-        "batch_size":32,
-        "buffer_size":5,
-        "lr_mult": 100,
-        "signal_window_stride":100
+        "batch_size":16,
+        "buffer_size":10,
+        "lr_mult": 10,
+        "signal_window_stride":600
     },
     "validation":{
         "data":"./data/validation.hdf5",
-        "batch_size":300,
-        "buffer_size":5,
+        "batch_size":150,
+        "buffer_size":10,
         "reads":10,
-        "signal_window_stride":300
+        "signal_window_stride":600
     },
     "testing":{
-        "batch_size":300,
-        "buffer_size":5,
+        "batch_size":32,
+        "buffer_size":10,
         "signal_window_stride":300,
+        "save_predictions":true,
         "reads":20,
         "bacteria":[
             {
