@@ -16,19 +16,19 @@ class FishNChips(tf.keras.Model):
         self.max_pool_layer_idx = max_pool_layer_idx
         self.max_pool = tf.keras.layers.MaxPooling1D(pool_size=max_pool_kernel_size, name="max_pool_1D")
         
-        self.cnn_blocks = [ConvolutionBlock([1,3,1], d_model, i) for i in range(num_cnn_blocks)]
+        self.cnn_blocks = [ConvolutionBlock([1,3,1], d_model, i, rate) for i in range(num_cnn_blocks)]
 
-        self.transformer = Transformer(num_layers=num_layers, d_model=d_model, output_dim=output_dim, num_heads=num_heads, dff=dff, pe_encoder_max_length=pe_encoder_max_length, pe_decoder_max_length=pe_decoder_max_length)
+        self.transformer = Transformer(num_layers=num_layers, d_model=d_model, output_dim=output_dim, num_heads=num_heads, dff=dff, pe_encoder_max_length=pe_encoder_max_length, pe_decoder_max_length=pe_decoder_max_length, rate=rate)
     
     def call(self, inp, tar, training, look_ahead_mask, use_cached_enc_ouput=False):
         x = self.first_cnn(inp) # to bring to proper dimensionality
-        x = self.call_cnn_blocks(x) # won't do anything if no cnn blocks
-        att_output, att_weights = self.transformer(x, tar, training, look_ahead_mask, use_cached_enc_ouput)
+        x = self.call_cnn_blocks(x, training) # won't do anything if no cnn blocks
+        att_output, att_weights = self.transformer(x, tar, training, look_ahead_mask, use_cached_enc_ouput, rate)
         return att_output, att_weights
 
-    def call_cnn_blocks(self, x):
+    def call_cnn_blocks(self, x, training):
         for i,cnn_block in enumerate(self.cnn_blocks):
-            x = cnn_block(x)
+            x = cnn_block(x, training)
             
             if(i == self.max_pool_layer_idx):
                 x = self.max_pool(x)
