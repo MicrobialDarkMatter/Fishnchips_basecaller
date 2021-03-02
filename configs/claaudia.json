@@ -1,7 +1,7 @@
 {
     "model":{
-        "signal_window_size": 300,
-        "label_window_size": 100,
+        "signal_window_size": 600,
+        "label_window_size": 200,
         "attention_blocks": 4,
         "cnn_blocks": 5,
         "maxpool_idx": 3,
@@ -32,7 +32,9 @@
     "testing":{
         "batch_size":300,
         "buffer_size":5,
-        "signal_window_stride":300,
+        "signal_window_stride":30,
+        "save_predications":true,
+        "mafft":"/opt/anaconda3/bin/mafft",
         "reads":20,
         "bacteria":[
             {

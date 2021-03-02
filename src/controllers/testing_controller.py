@@ -6,6 +6,7 @@ from src.utils.base_converter import convert_to_base_strings
 from src.utils.assembler import assemble
 from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
+from src.controllers.assembly_controller import AssemblyController
 
 class TestingController():
     def __init__(self, config, experiment_name, model, new_testing):
@@ -19,6 +20,7 @@ class TestingController():
         self.use_assembler = test_config['signal_window_stride'] < model_config['signal_window_size']
         self.save_predictions = test_config['save_predictions']
         self.inference_controller = InferenceController()
+        self.assembly_controller = AssemblyController(config, experiment_name)
 
         self.file_controller = FileController(experiment_name)
         self.results = [] if new_testing else self.file_controller.load_testing()
@@ -41,7 +43,7 @@ class TestingController():
             return ''.join(y_pred)
         print(' - - Assembling.')
         assembly_path = self.file_controller.get_assembly_filepath(iteration, read_id, bacteria)        
-        consesnsus, confidence = assemble(y_pred, assembly_path)
+        consesnsus, confidence = self.assembly_controller.assemble(y_pred, assembly_path)
         return consesnsus
 
     def get_result(self, assembly, aligner, read_id, bacteria):
@@ -70,13 +72,6 @@ class TestingController():
             'cigacc': cigacc
         }
 
-    def trim_predications(predications):
-        trimmed = []
-        for prediction in predications:
-            prediction = prediction[len(prediction)//2:]
-            trimmed.append(prediction)
-        return trimmed
-
     def test(self, bacteria, generator, aligner):
         print(f' - Testing {bacteria}.')
         for i in range(self.reads):
@@ -93,7 +88,7 @@ class TestingController():
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
                     y_pred.extend(y_batch_pred_strings)
                 
-                y_pred = trim_predications(y_pred, )
+                y_pred = map(lambda x: x[:len(x)//2], y_pred)
                 assembly = self.get_assembly(y_pred, i, read_id, bacteria)
                 self.save_prediction(assembly, bacteria, read_id, i)
                 
