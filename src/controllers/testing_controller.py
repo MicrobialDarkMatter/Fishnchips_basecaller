@@ -3,7 +3,6 @@ import traceback
 import mappy as mp
 
 from src.utils.base_converter import convert_to_base_strings
-from src.utils.assembler import assemble
 from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
 from src.controllers.assembly_controller import AssemblyController
