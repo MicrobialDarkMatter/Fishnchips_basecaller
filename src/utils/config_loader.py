@@ -49,7 +49,7 @@ def verify_test_config(test_config, model_config):
     assert type(test_config['buffer_size']) == int and test_config['buffer_size'] > 0, 'Test buffer size must be a positive integer.'
     assert type(test_config['signal_window_stride']) == int and test_config['signal_window_stride'] > 0 and test_config['signal_window_stride'] <= model_config['signal_window_size'], 'Test signal window stride must be a non-negative integer, smaller or equal to signal windows size (otherwise signal values are skipped).'
     assert type(test_config['reads']) == int and test_config['reads'] > 0, 'Number of reads to test must be a positive integer.'
-    assert test_config['save_predictions'] == 'true' or test_config['save_predictions'] == 'false', 'Save prediction flag must be a boolean value.'
+    assert type(test_config['save_predictions'] == bool), 'Save prediction flag must be a boolean value.'
     assert os.path.exists(test_config['mafft']), 'MAFFT path not found.'
 
     assert type(test_config['bacteria']) == list, 'Test bacteria must be a list.'
