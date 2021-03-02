@@ -33,7 +33,7 @@
         "batch_size":300,
         "buffer_size":5,
         "signal_window_stride":30,
-        "save_predications":true,
+        "save_predictions":true,
         "mafft":"/opt/anaconda3/bin/mafft",
         "reads":20,
         "bacteria":[
