@@ -9,8 +9,8 @@ class AssemblyController():
         self.mafft_path = config['testing']['mafft']
         self.experiment_name = experiment_name
     
-    def assemble(self, predications, filepath):
-        chunks = self.align_predications(predications)
+    def assemble(self, predictions, filepath):
+        chunks = self.align_predictions(predictions)
         indexes = self.align_chunks(chunks)
         columns = self.get_alignment_columns(chunks, indexes)
         consensus, confidence = self.get_consensus(columns)
@@ -30,7 +30,7 @@ class AssemblyController():
             else:
                 print(f'\033[91m{char}\033[0m', end='')
 
-    def align_predications(self, predictions):
+    def align_predictions(self, predictions):
         chunks = []
         chunk_size = 10
         for i in range(0,len(predictions), chunk_size):

@@ -87,7 +87,7 @@ class TestingController():
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
                     y_pred.extend(y_batch_pred_strings)
                 
-                y_pred = map(lambda x: x[:len(x)//2], y_pred)
+                y_pred = list(map(lambda x: x[:len(x)//2], y_pred))
                 assembly = self.get_assembly(y_pred, i, read_id, bacteria)
                 self.save_prediction(assembly, bacteria, read_id, i)
                 
