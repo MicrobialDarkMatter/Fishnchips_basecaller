@@ -3,7 +3,7 @@ import traceback
 import mappy as mp
 
 from src.utils.base_converter import convert_to_base_strings
-from src.utils.assembler import assemble_and_output
+from src.utils.assembler import assemble
 from src.controllers.file_controller import FileController
 from src.controllers.inference_controller import InferenceController
 
@@ -39,8 +39,10 @@ class TestingController():
     def get_assembly(self, y_pred, iteration, read_id, bacteria):
         if self.use_assembler == False:
             return ''.join(y_pred)
-        assembly_path = self.file_controller.get_assembly_filepath(iteration, read_id, bacteria)
-        return assemble_and_output(assembly_path, y_pred)
+        print(' - - Assembling.')
+        assembly_path = self.file_controller.get_assembly_filepath(iteration, read_id, bacteria)        
+        consesnsus, confidence = assemble(y_pred, assembly_path)
+        return consesnsus
 
     def get_result(self, assembly, aligner, read_id, bacteria):
         try:
@@ -68,6 +70,13 @@ class TestingController():
             'cigacc': cigacc
         }
 
+    def trim_predications(predications):
+        trimmed = []
+        for prediction in predications:
+            prediction = prediction[len(prediction)//2:]
+            trimmed.append(prediction)
+        return trimmed
+
     def test(self, bacteria, generator, aligner):
         print(f' - Testing {bacteria}.')
         for i in range(self.reads):
@@ -84,6 +93,7 @@ class TestingController():
                     y_batch_pred_strings = convert_to_base_strings(y_batch_pred)
                     y_pred.extend(y_batch_pred_strings)
                 
+                y_pred = trim_predications(y_pred, )
                 assembly = self.get_assembly(y_pred, i, read_id, bacteria)
                 self.save_prediction(assembly, bacteria, read_id, i)
                 

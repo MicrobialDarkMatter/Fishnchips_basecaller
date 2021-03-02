@@ -13,4 +13,5 @@ trained_models/*
 temps
 scripts
 wandb
+aligning
 _my_model_backup

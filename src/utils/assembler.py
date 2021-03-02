@@ -1,144 +1,174 @@
-from itertools import zip_longest
-import collections
-import editdistance
-import numpy as np
-import operator
 import os
+import math
+import numpy as np
+from Bio.Align.Applications import MafftCommandline
+from io import StringIO
+from Bio import AlignIO
 
-def assemble(base_string_list, window=5):
-  aligned_seq = _get_aligned_sequences(base_string_list, window)
-  return _get_assembled_string(aligned_seq)
 
-def assemble_from_file(path):
-  file = np.load(path, allow_pickle=True)
-  return assemble(file[0])
+def assemble(predictions, save_path = ''):
+    chunks = get_chunked_alignment(predictions)
+    indexes = get_alignment_indexes(chunks)  
+    columns = get_columns(chunks, indexes)
+    consensus, confidence = get_consensus(columns)
+    if save_path != '':
+        make_assembly_file(chunks, indexes, consensus, save_path)  
+    return consensus, confidence
 
-def assemble_and_output(filename, base_string_list, window=5):
-  aligned_seq = _get_aligned_sequences(base_string_list, window)
-  assembled = _get_assembled_string(aligned_seq)
-  _output(aligned_seq, assembled, filename)
-  return assembled
+def print_confidence_string(consesnsus, confidence):
+    result = zip(consensus, confidence)
+    for char, confidence in result:
+        if confidence > 0.9:
+            print(f'\033[92m{char}\033[0m', end='')
+        elif confidence > 0.75:
+            print(f'\033[94m{char}\033[0m', end='')
+        elif confidence > 0.5:
+            print(f'\u001b[33m{char}\033[0m', end='')
+        else:
+            print(f'\033[91m{char}\033[0m', end='')
 
-def assemble_and_output_labelled(filename, y_pred, y_true):
-  aligned_seq = _get_aligned_sequences(y_pred, window=5)
-  injected_aligned_seq = []
-  for i,(pad_idx,seq) in enumerate(aligned_seq):
-    true_pair = (pad_idx, y_true[i].lower())
-    pred_pair = (pad_idx,seq)
-    injected_aligned_seq.append(true_pair)
-    injected_aligned_seq.append(pred_pair)
-  
-  assembled = _get_assembled_string(aligned_seq)
-  _output(injected_aligned_seq, assembled, filename)
-  return assembled
-  
-def compare(assembled_string, reference_string):
-  return editdistance.eval(assembled_string, reference_string)
+def get_consensus(columns):
+    consesnsus = ''
+    confidence = []
+    for column_str in columns:
+        char, score = get_most_frequent_element(column_str)
+        consesnsus += char
+        confidence.append(score)
+    return consesnsus, confidence
 
-def compare_from_file(path):
-  file = np.load(path, allow_pickle=True)
-  assembled_string = assemble(file[0])
-  reference_string = file[1]
-  return compare(assembled_string,reference_string)
+def trim_column(str_col):
+    m = -1
+    n = -1
+    for i,char in enumerate(str_col):
+        if char in 'actg_':
+            m = i
+            break
+    for i,char in reversed(list(enumerate(str_col))):
+        if char in 'actg_':
+            n = i
+            break
+    return str_col[m:n+1]
 
-def _output(alignments, assembled, filename):
-  if (os.path.exists(filename)):
-    os.remove(filename)
-  
-  with open(filename, 'a') as f:
-    start_index = _get_closest_index(alignments)
-    
-    for alignment in alignments:
-      idx = alignment[0]
-      seq = alignment[1]
-      alignment_string = _get_alignment_string(seq, idx)
-      f.write(alignment_string + '\n')
-    
-    alignment_string = _get_alignment_string(assembled, start_index)
-    f.write(alignment_string)
+def get_column_string(chunk, index, col):
+    try:
+        i = col - index
+        arr = np.array(chunk)
+        column = arr[:,i]
+        s = ''.join(column.tolist())
+        return s
+    except:
+        return '____'
 
-def _get_assembled_string(alignments):
-    padded = _pad_seq_list(alignments)
-    zipped = list(zip_longest(*padded, fillvalue=" "))
-    return "".join(list(map(_get_most_popular_base, zipped)))
+def get_columns(chunks, indexes):
+    columns = []
+    size = len(chunks[-1][0]) + indexes[-1]
+    idx = 0
+    for col in range(size):
+        next_chunk = col >= len(chunks[idx][0]) + indexes[idx]
+        if next_chunk:
+            idx += 1
+        if idx == len(indexes) -1:
+            s = get_column_string(chunks[idx], indexes[idx], col)
+            s = trim_column(s)
+            columns.append(s)
+            continue
+        overlap = col >= indexes[idx+1]
+        if overlap:
+            s1 = get_column_string(chunks[idx], indexes[idx], col)
+            s2 = get_column_string(chunks[idx+1], indexes[idx+1], col)
+            s = s1 + s2
+            s = trim_column(s)
+            columns.append(s)            
+        else:
+            s = get_column_string(chunks[idx], indexes[idx], col)
+            s = trim_column(s)
+            columns.append(s)
+    return columns
 
-"""
-seq_list : ['AATTAA', 'ATAAC',...] 
-returns seq_list made into a tuple, where index is the index
-"""
-def _get_aligned_sequences(seq_list,window):
-    aligned_seq_list = []
-    
-    for i, seq in enumerate(seq_list):
-        window_seq_list = aligned_seq_list[max(0, i-window):i] # this is just the context window
-        # if len(seq) < 3:
-        #   continue
-        index = _find_alignment_index(window_seq_list, seq) # this is what computes the offset of seq
-        aligned_seq_list.append((index,seq))
+def get_alignment_indexes(chunks):
+    indexes = []
+    indexes.append(0)
+    for i,_ in enumerate(chunks):
+        if i + 1 == len(chunks):
+            break
+        c1 = np.array(chunks[i])
+        c2 = np.array(chunks[i+1])
+        s1 = c1.shape[1]
+        s2 = c2.shape[1]
+        max_score = -100
+        max_idx = None
+        for overlap_idx in range(s1):
+            score = 0
+            for col_idx in range(min(s1 - overlap_idx, s2)):
+                c1_col_idx = overlap_idx + col_idx
+                c2_col_idx = col_idx
+                c1_col = c1[:,c1_col_idx]
+                c2_col = c2[:,c2_col_idx]
+                e1, _ = get_most_frequent_element(c1_col.tolist())
+                e2, _ = get_most_frequent_element(c2_col.tolist())
+                score += 1 if e1 == e2 else -1
+            if score > max_score:
+                max_score = score
+                max_idx = overlap_idx   
+        indexes.append(max_idx + indexes[-1])
+    return indexes
 
-    return aligned_seq_list
+def get_chunked_alignment(predictions, chunk_size=10):
+    mafft_path = '/opt/anaconda3/bin/mafft'
+    chunks = []
+    for i in range(0,len(predictions), chunk_size):
+        batch = predictions[i:i+chunk_size]
+        temp_filepath = './temps/predications.txt'
+        make_prediction_file(batch, temp_filepath)
+        mafft_cline = MafftCommandline(mafft_path, input=temp_filepath)
+        stdout, _ = mafft_cline()
+        alignment = AlignIO.read(StringIO(stdout), 'fasta')
+        
+        chunk = []
+        for line in alignment:
+            chunk.append(list(line))
+        chunks.append(chunk)
+    return chunks
 
-def _find_alignment_index(seq_list, seq_to_align):
-  if(len(seq_list) == 0):
-    return 0
-  
-  # alignment_from = _get_closest_index(seq_list)-len(seq_to_align)+1 # returns the smallest `index` in the context window
-  alignment_from = _get_closest_index(seq_list)+1 # returns the smallest `index` in the context window
-  alignment_to = _get_furthest_index(seq_list)-1 # returns the furthest away character
+def get_most_frequent_element(lst): 
+    assert len(lst) > 0
+    dict = {} 
+    count, itm = 0, '' 
+    for item in reversed(lst): 
+        dict[item] = dict.get(item, 0) + 1
+        if dict[item] >= count and item != '-': 
+            count, itm = dict[item], item 
+    return (itm), round(count/len(lst), 2)
 
-  max_score = 0
-  max_score_index = alignment_to
+def make_prediction_file(predictions, path):
+    with open(path, 'w') as f:
+        for i,prediction in enumerate(predictions):
+            f.write(f'>s{i}\n')
+            f.write(f'{prediction}\n')
 
-  for i in range(alignment_from, alignment_to):
-    score = _calc_score(seq_list, seq_to_align, i)
-    if(score > max_score):
-      max_score, max_score_index = score, i
-  return max_score_index
+def make_assembly_file(chunks, indexes, consensus, path):
+    if os.path.exists(path):
+        os.remove(path)
+    with open(path, 'a') as f:
+        for i,chunk in enumerate(chunks):
+            for line in chunk:
+                f.write(f'{indexes[i]*"-"}{"".join(line)}\n')
+        f.write(consensus)
+        
+def prep():
+    with open('./aligning/sequences.txt', 'r') as f:
+        data = f.read()
+    sequences = data.split('\n')
+    new_sequences = []
+    for sequence in sequences[:-1]:
+        new_sequence = []
+        for char in sequence:
+            if char in 'ATCG':
+                new_sequence.append(char)
+        if len(new_sequence) > 0:
+            new_sequences.append(''.join(new_sequence))
+    return new_sequences
 
-def _calc_score(seq_list, seq_to_align, index):
-  seq_list = seq_list.copy()
-    
-  min_in_list = min(a for (a,_) in seq_list)
-  min_offset = min(min_in_list, index)
-
-  seq_list = [(a-min_offset, b) for (a,b) in seq_list]
-  index -= min_offset
-
-  # transforms into relative padded strings
-  padded_seq_list = _pad_seq_list(seq_list)
-  seq_to_align = " "*index+seq_to_align
-
-  # zip them for count(), if only one then just make lists of 1
-  if len(padded_seq_list) > 1:
-      zipped_list = list(zip_longest(*padded_seq_list, fillvalue=" "))
-  else:
-      zipped_list = [[a] for a in padded_seq_list[0]]
-
-  counts = list(map(lambda x: x[1].count(x[0]) if x[0] != " " else 0, zip(seq_to_align, zipped_list)))
-  return sum(counts[index:])
-
-def _get_furthest_index(seq_list):
-    return max([i+len(l) for (i,l) in seq_list])
-
-def _get_closest_index(seq_list):
-    return min([i for (i,l) in seq_list])
-
-def _pad_seq_list(seq_list):
-  return [" "*a+b for (a,b) in seq_list]
-
-def _get_most_popular_base(base_string):
-  base_count_dic = _count_bases(base_string)
-  return max(base_count_dic.items(), key=operator.itemgetter(1))[0]
-
-def _count_bases(base_string):
-    d = {}
-    for l in "ATCG":
-        d[l] = base_string.count(l)
-    return d
-  
-def _get_alignment_string(s,i):
-    pan = 10
-    if(i < 0):
-        pan = pan + i
-    return pan * '+' + i%100 * '_' + s + f"    :{i}"
-
+predictions = prep()
+consensus, confidence = assemble(predictions[:1000], './temps/assembly_test.txt')
+print_confidence_string(consensus, confidence)
