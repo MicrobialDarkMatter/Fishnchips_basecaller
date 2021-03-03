@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from ont_fast5_api.fast5_interface import get_fast5_file
+from scipy.signal import find_peaks
 
 class RawDataLoader():
     def __init__(self, data_directory_path, signal_window_size, signal_window_stride):
@@ -21,7 +22,8 @@ class RawDataLoader():
     def get_read(self):
         read_filepath = f'{self.data_directory_path}/{self.read_files[self.position]}'
         self.position += 1
-        dacs, read_id = self.load_file(read_filepath)
+        read = self.load_file(read_filepath)
+        dacs, read_id = self.scale(read)
         dacs = self.normilize(dacs) 
         windows = self.segment_read(dacs)
         x = np.array(windows)
@@ -33,8 +35,19 @@ class RawDataLoader():
             read_ids = f5.get_read_ids()
             assert len(read_ids) == 1, f'File {filepath} contains multiple reads.'    
             for read in f5.get_reads():
-                return read.get_raw_data(), read.read_id
-    
+                channel_info = read.get_channel_info()
+                return {
+                    'read_id': read.read_id,
+                    'raw':read.get_raw_data(),
+                    'offset':channel_info['offset'],
+                    'digitisation':channel_info['digitisation'],
+                    'range':channel_info['range']
+                }
+
+    def scale(self, read):
+        dacs = read['range'] / read['digitisation'] * (read['raw'] + read['offset']) 
+        return dacs, read['read_id']
+
     def normilize(self, dacs):
         dacs = np.array(dacs)
         mean = np.mean(dacs)
