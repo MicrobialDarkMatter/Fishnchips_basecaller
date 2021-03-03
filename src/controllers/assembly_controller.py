@@ -56,8 +56,8 @@ class AssemblyController():
             c2 = np.array(chunks[i+1])
             s1 = c1.shape[1]
             s2 = c2.shape[1]
-            max_score = -100
-            max_idx = None
+            max_score = -1e5
+            max_idx = 0
             for overlap_idx in range(s1):
                 score = 0
                 for col_idx in range(min(s1 - overlap_idx, s2)):
@@ -158,7 +158,8 @@ class AssemblyController():
                 f.write(f'{prediction}\n')
 
     def get_most_frequent_element(self, lst):
-        assert len(lst) > 0
+        if len(lst) > 0:
+            return '-'
         dict = {} 
         count, itm = 0, '' 
         for item in reversed(lst): 
