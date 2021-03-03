@@ -110,6 +110,8 @@ class AssemblyController():
         return consesnsus, confidence
 
     def save(self, chunks, indexes, consensus, confidence, filepath):
+        if os.path.exists(filepath):
+            os.remove(filepath)
         with open(filepath, 'a') as f:
             for i,chunk in enumerate(chunks):
                 for line in chunk:
@@ -158,7 +160,7 @@ class AssemblyController():
                 f.write(f'{prediction}\n')
 
     def get_most_frequent_element(self, lst):
-        if len(lst) > 0:
+        if len(lst) == 0:
             return '-', 0
         dict = {} 
         count, itm = 0, '' 
