@@ -159,7 +159,7 @@ class AssemblyController():
 
     def get_most_frequent_element(self, lst):
         if len(lst) > 0:
-            return '-'
+            return '-', 0
         dict = {} 
         count, itm = 0, '' 
         for item in reversed(lst): 
