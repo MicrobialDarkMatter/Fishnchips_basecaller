@@ -58,7 +58,7 @@ class AssemblyController():
             s2 = c2.shape[1]
             max_score = -1e5
             max_idx = 0
-            for overlap_idx in range(s1):
+            for overlap_idx in range(s1//2,s1):
                 score = 0
                 for col_idx in range(min(s1 - overlap_idx, s2)):
                     c1_col_idx = overlap_idx + col_idx
