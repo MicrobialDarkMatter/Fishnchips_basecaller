@@ -8,15 +8,12 @@ def load_config(path):
     return config
 
 def verify_config(config):
-    try:
-        verify_model_config(config['model'])
-        verify_train_config(config['training'], config['model'])
-        vefify_validation_config(config['validation'], config['model'])
-        verify_test_config(config['testing'], config['model'])
-        print(' - Config was successfully loaded.')
-    except Exception as e:
-        print(e)
-        print(' ! Config verification has failed.')
+    print(' ! Verifying config...')
+    verify_model_config(config['model'])
+    verify_train_config(config['training'], config['model'])
+    vefify_validation_config(config['validation'], config['model'])
+    verify_test_config(config['testing'], config['model'])
+    print(' - Config was successfully loaded.')
 
 def verify_model_config(model_config):
     assert type(model_config['signal_window_size']) == int and model_config['signal_window_size'] > 0, 'Max length of Encoder must be a positive integer. It corresponds to input signal window size.'
