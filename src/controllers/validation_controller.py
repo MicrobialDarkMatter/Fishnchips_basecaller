@@ -31,7 +31,7 @@ class ValidationController():
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                         = self.inference_controller.predict_batch_ctc(x_batch, model)
+                    y_batch_pred = self.inference_controller.predict_batch_ctc(x_batch, model)
                     y_pred.extend(y_batch_pred)
 
                 total_editdistance = 0

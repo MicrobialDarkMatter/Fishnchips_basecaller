@@ -40,7 +40,7 @@ class InferenceController():
         y_lengths = np.array(batch_size*[y.shape[0]])
         decoded, log_probabilities = tf.nn.ctc_beam_search_decoder(y, y_lengths, beam_width=3, top_paths=1)
         decoded_paths = tf.sparse.to_dense(decoded[0])
-        return decoded_paths
+        return decoded_paths.numpy()
 
     def predict_batch_opt(self, x, model):
         batch_size = x.shape[0]
