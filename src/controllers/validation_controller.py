@@ -1,6 +1,7 @@
 import tensorflow as tf
 import editdistance
 import mappy as mp
+import traceback
 import time
 import math
 
@@ -30,13 +31,13 @@ class ValidationController():
                 y_pred = []
                 for b in range(0, len(x), self.batch_size):
                     x_batch = x[b:b+self.batch_size]
-                    y_batch_pred = self.inference_controller.predict_batch(x_batch, model)
+                         = self.inference_controller.predict_batch_ctc(x_batch, model)
                     y_pred.extend(y_batch_pred)
 
                 total_editdistance = 0
                 for pred, true in zip(y_pred, y_true):
-                    pred_str = convert_to_base_string(pred, skip_tokens=['S', 'E', 'P'])
-                    true_str = convert_to_base_string(true, skip_tokens=['S', 'E', 'P'])
+                    pred_str = convert_to_base_string(pred, skip_tokens=['P'])
+                    true_str = convert_to_base_string(true, skip_tokens=['P'])
                     total_editdistance += editdistance.eval(pred_str, true_str)
                 average_editdistance = total_editdistance / len(y_pred)
                 validation_loss += average_editdistance

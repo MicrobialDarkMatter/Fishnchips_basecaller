@@ -1,0 +1,56 @@
+{
+    "model": {
+        "signal_window_size": 300,
+        "label_window_size": 100,
+        "attention_blocks": 4,
+        "cnn_blocks": 5,
+        "maxpool_idx": 3,
+        "d_model": 250,
+        "dff": 512,
+        "num_heads": 25,
+        "dropout_rate": 0.1,
+        "maxpool_kernel": 6
+    },
+    "training": {
+        "data": "./data/validation.hdf5",
+        "epochs": 1,
+        "warmup": 1,
+        "patience": 1,
+        "batches": 5,
+        "batch_size": 16,
+        "buffer_size": 1,
+        "lr_mult": 100,
+        "signal_window_stride": 100
+    },
+    "validation": {
+        "data": "./data/validation.hdf5",
+        "batch_size": 16,
+        "buffer_size": 5,
+        "reads": 1,
+        "signal_window_stride": 300
+    },
+    "testing": {
+        "batch_size": 300,
+        "buffer_size": 5,
+        "signal_window_stride": 300,
+        "save_predictions":true,
+        "reads": 1,
+        "bacteria": [
+            {
+                "name": "Acinetobacter_pittii_16-377-0801",
+                "data": "./data/filtered_test_data/Acinetobacter_pittii_16-377-0801",
+                "reference": "./data/filtered_test_data/Acinetobacter_pittii_16-377-0801/reference.fasta"
+            },
+            {
+                "name": "Haemophilus_haemolyticus_M1C132_1",
+                "data": "./data/filtered_test_data/Haemophilus_haemolyticus_M1C132_1",
+                "reference": "./data/filtered_test_data/Haemophilus_haemolyticus_M1C132_1/reference.fasta"
+            },
+            {
+                "name": "Klebsiella_pneumoniae_INF032",
+                "data": "./data/filtered_test_data/Klebsiella_pneumoniae_INF032",
+                "reference": "./data/filtered_test_data/Klebsiella_pneumoniae_INF032/reference.fasta"
+            }
+        ]
+    }
+}

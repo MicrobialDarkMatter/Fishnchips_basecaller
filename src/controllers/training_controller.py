@@ -34,8 +34,8 @@ class TrainingController():
         learning_rate = CustomSchedule(model_config['d_model']*training_config['lr_mult'])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
-        self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
-        self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none') 
+        # self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+        # self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none') 
 
     def train(self):
         print(' - Training model.')
@@ -48,21 +48,21 @@ class TrainingController():
             waited = 0 if epoch < self.warmup else waited
             start_time = time.time()
             self.train_loss.reset_states()
-            self.train_accuracy.reset_states()
+            # self.train_accuracy.reset_states()
 
             batches = next(self.generator.get_batches(self.batches))
             for batch,(x,y) in enumerate(batches):
                 x = tf.constant(x, dtype=tf.float32)
                 y = tf.constant(y, dtype=tf.int32)                
                 self.train_step(x, y)
-                print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
+                print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} ', end="\r")
             print()
 
             current_validation_loss = self.validation_controller.validate(self.model)
             lr = self.get_current_learning_rate()
-            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
+            self.results.append([self.train_loss.result(), current_validation_loss, time.time(), lr])
             self.file_controller.save_training(self.results)            
-            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
+            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
 
             if current_validation_loss < validation_loss:
                 waited = 0
@@ -81,18 +81,14 @@ class TrainingController():
     
     @tf.function
     def train_step(self, x, y):
-        y_input = y[:, :-1]
-        y_label = y[:, 1:]
-    
-        combined_mask = create_combined_mask(y_input) 
+
         with tf.GradientTape() as tape:
-            y_prediction, _ = self.model(x, y_input, True, combined_mask)   
-            loss = self.model.get_loss(y_label, y_prediction, self.loss_object)
+            y_prediction = self.model(x, training=True)   
+            loss = self.model.get_ctc_loss(y, y_prediction)
 
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
-        self.train_accuracy(y_label, y_prediction)
 
     def get_best_validation_loss(self):
         results = np.array(self.results)

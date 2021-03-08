@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import tensorflow as tf
 
 from src.model.ConvBlock import ConvolutionBlock
@@ -17,14 +18,13 @@ class FishNChips(tf.keras.Model):
         self.max_pool = tf.keras.layers.MaxPooling1D(pool_size=max_pool_kernel_size, name="max_pool_1D")
         
         self.cnn_blocks = [ConvolutionBlock([1,3,1], d_model, i) for i in range(num_cnn_blocks)]
-
         self.transformer = Transformer(num_layers=num_layers, d_model=d_model, output_dim=output_dim, num_heads=num_heads, dff=dff, pe_encoder_max_length=pe_encoder_max_length, pe_decoder_max_length=pe_decoder_max_length)
     
-    def call(self, inp, tar, training, look_ahead_mask, use_cached_enc_ouput=False):
-        x = self.first_cnn(inp) # to bring to proper dimensionality
+    def call(self, x, training):
+        x = self.first_cnn(x) # to bring to proper dimensionality
         x = self.call_cnn_blocks(x) # won't do anything if no cnn blocks
-        att_output, att_weights = self.transformer(x, tar, training, look_ahead_mask, use_cached_enc_ouput)
-        return att_output, att_weights
+        x = self.transformer(x, training)
+        return x
 
     def call_cnn_blocks(self, x):
         for i,cnn_block in enumerate(self.cnn_blocks):
@@ -34,10 +34,20 @@ class FishNChips(tf.keras.Model):
                 x = self.max_pool(x)
         return x
 
-    def get_loss(self, real, pred, loss_object):
+    def get_cross_entrophy_loss(self, real, pred, loss_object):
         mask = tf.math.logical_not(tf.math.equal(real, 0))
         loss_ = loss_object(real, pred)
 
         mask = tf.cast(mask, dtype=loss_.dtype)
         loss_ *= mask
         return tf.reduce_mean(loss_)
+
+    def get_ctc_loss(self, labels, logits):       
+        logit_lengths = np.array(logits.shape[0]*[logits.shape[1]])
+        label_lengths = np.array(labels.shape[0]*[labels.shape[1]])
+        loss = tf.nn.ctc_loss(
+            labels, logits, label_lengths, logit_lengths, 
+            logits_time_major=False, unique=None,blank_index=0)
+        return loss
+        
+        

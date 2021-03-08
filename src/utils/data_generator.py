@@ -27,12 +27,12 @@ class DataGenerator():
 
     def convert_to_target_language(self, y_raw):
         y = []
-        start_token = 5
-        end_token = 6
+        # start_token = 5
+        # end_token = 6
         for y_window in y_raw:
             y_window = [b+1 for b in y_window] 
-            y_window.insert(0, start_token)
-            y_window.append(end_token)
+            # y_window.insert(0, start_token)
+            # y_window.append(end_token)
             padding_len = self.label_window_size - len(y_window)
             y_window.extend([0]*padding_len)
             y.append(y_window)
