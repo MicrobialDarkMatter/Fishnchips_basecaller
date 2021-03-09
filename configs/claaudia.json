@@ -17,19 +17,19 @@
         "batch_size":32,
         "buffer_size":5,
         "lr_mult": 100,
-        "signal_window_stride":100
+        "signal_window_stride":2048
     },
     "validation":{
         "data":"./data/validation.hdf5",
         "batch_size":300,
         "buffer_size":5,
         "reads":10,
-        "signal_window_stride":300
+        "signal_window_stride":2048
     },
     "testing":{
         "batch_size":300,
         "buffer_size":5,
-        "signal_window_stride":300,
+        "signal_window_stride":2048,
         "save_predictions":true,
         "reads":20,
         "bacteria":[

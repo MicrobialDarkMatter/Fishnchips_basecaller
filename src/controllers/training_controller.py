@@ -96,7 +96,7 @@ class TrainingController():
             y = tf.constant(y[:1], dtype=tf.int32)
             p = self.model(x, training=True)
             p = tf.transpose(p, [1, 0, 2])
-            p, _ = tf.nn.ctc_greedy_decoder(p, np.array(1*[100]), merge_repeated=False)
+            p, _ = tf.nn.ctc_greedy_decoder(p, np.array(1*[self.model.max_input_length/4]), merge_repeated=False)
             p = p[0].values.numpy()
             print(' = = Sample output:')
             print(f' = = predicted: {convert_to_ctc_base_string(p)} | {p.shape}')

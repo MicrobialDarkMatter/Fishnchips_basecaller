@@ -7,12 +7,15 @@ from src.model.Attention.Transformer import Transformer
 from src.model.Attention.Encoder import Encoder
 
 class FishNChips(tf.keras.Model):
-    def __init__(self, num_cnn_blocks, max_pool_layer_idx, max_pool_kernel_size, num_layers, d_model, output_dim, num_heads, dff, pe_encoder_max_length, pe_decoder_max_length, rate=0.1):
+    def __init__(self, encoder_blocks, d_model, output_dim, num_heads, dff, max_input_length, max_output_length, dropout):
         super(FishNChips, self).__init__()
 
-        self.cnn_block_1 = ConvolutionBlock(filters=d_model/2, kernel=3, dropout_rate=rate, idx=1)
-        self.cnn_block_2 = ConvolutionBlock(filters=d_model, kernel=3, dropout_rate=rate, idx=2)
-        self.encoder = Encoder(num_layers, d_model, num_heads, dff, pe_encoder_max_length, rate)
+        self.max_input_length = max_input_length
+        self.max_output_length = max_output_length
+
+        self.cnn_block_1 = ConvolutionBlock(filters=d_model/2, kernel=3, dropout_rate=dropout, idx=1)
+        self.cnn_block_2 = ConvolutionBlock(filters=d_model, kernel=3, dropout_rate=dropout, idx=2)
+        self.encoder = Encoder(encoder_blocks, d_model, num_heads, dff, max_input_length, dropout)
         self.linear = tf.keras.layers.Dense(output_dim)
     
     def call(self, x, training):
