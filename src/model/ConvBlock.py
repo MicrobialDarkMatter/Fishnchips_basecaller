@@ -1,19 +1,16 @@
 import tensorflow as tf
 
 class ConvolutionBlock(tf.keras.layers.Layer):
-    def __init__(self, cnn_dims, filters, idx):
+    def __init__(self, filters, kernel, dropout_rate, idx):
         super(ConvolutionBlock, self).__init__()
+        self.dropout_layer = tf.keras.layers.Dropout(dropout_rate)
+        self.cnn_layer = tf.keras.layers.Conv1D(filters, kernel, padding="same", activation=None, strides=2, name=f'conv_{idx}')
+        self.bn_layer = tf.keras.layers.BatchNormalization(name=f'bn_{idx}')
+        self.activation_layer = tf.keras.layers.Activation('relu', name=f'activation_{idx}')
 
-        self.cnn_layers = [tf.keras.layers.Conv1D(filters, dim, padding="same", activation="relu", use_bias="false", name=f"res{idx}-c{i}") for i,dim in enumerate(cnn_dims)]
-        self.bn_layers = [tf.keras.layers.BatchNormalization() for _ in cnn_dims]
-        self.activation_layer = tf.keras.layers.Activation('relu', name=f"res{idx}-relu")
-        
     def call(self, x):
-        res = x
-        for cnn_layer, bn_layer in zip(self.cnn_layers, self.bn_layers):
-            x = cnn_layer(x)
-            x = bn_layer(x)
-        
-        x += res
+        x = self.dropout_layer(x)
+        x = self.cnn_layer(x)
+        x = self.bn_layer(x)
         x = self.activation_layer(x)
         return x

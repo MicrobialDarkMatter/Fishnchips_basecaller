@@ -6,7 +6,15 @@ base_map = {
     4: 'T',
     5: 'S',
     6: 'E'
-}    
+}  
+
+ctc_base_map = {
+    0: '-',
+    1: 'A',
+    2: 'C',
+    3: 'G',
+    4: 'T'
+}
 
 """
 Param int_base_lists: list of int base lists (e.g. [[1,2,3],[1,1,1],[2,2,2]], corresponding to ['ACG',...])
@@ -27,4 +35,10 @@ def convert_to_base_string(int_base_list, skip_tokens=['S', 'E', 'P']):
         if str_base_token not in skip_tokens:
             base_string += str_base_token
     return base_string
-                
+
+def convert_to_ctc_base_string(int_base_list):
+    base_string = ''
+    for int_base_token in int_base_list:
+        str_base_token = ctc_base_map[int_base_token]
+        base_string += str_base_token
+    return base_string  

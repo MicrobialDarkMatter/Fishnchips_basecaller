@@ -1,15 +1,12 @@
 {
     "model":{
-        "signal_window_size": 300,
-        "label_window_size": 100,
-        "attention_blocks": 4,
-        "cnn_blocks": 5,
-        "maxpool_idx": 3,
-        "d_model": 250,
+        "signal_window_size": 2048,
+        "label_window_size": 300,
+        "attention_blocks": 6,
+        "d_model": 512,
         "dff": 512,
-        "num_heads": 25,
-        "dropout_rate": 0.1,
-        "maxpool_kernel": 6
+        "num_heads": 8,
+        "dropout_rate": 0.1
     },
     "training":{
         "data":"./data/training.hdf5",

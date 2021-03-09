@@ -19,13 +19,13 @@ def verify_model_config(model_config):
     assert type(model_config['signal_window_size']) == int and model_config['signal_window_size'] > 0, 'Max length of Encoder must be a positive integer. It corresponds to input signal window size.'
     assert type(model_config['label_window_size']) == int and model_config['label_window_size'] > 0, 'Max length of Decoder must be a positive integer. It corresponds to output label window size.'
     assert type(model_config['attention_blocks']) == int and model_config['attention_blocks'] > 0, 'Number of attention blocks must be a positive integer.'
-    assert type(model_config['cnn_blocks']) == int and model_config['cnn_blocks'] > 0, 'Number of CNN blocks must be a positive integer.'
-    assert type(model_config['maxpool_idx']) == int and model_config['maxpool_idx'] >= 0 & model_config['maxpool_idx'] < model_config['cnn_blocks'], 'Max pool idx must be a non-negative integer. It is intended to determine between which CNN block a maxpool layer is placed.'
+    # assert type(model_config['cnn_blocks']) == int and model_config['cnn_blocks'] >= 0, 'Number of CNN blocks must be a non-negative integer.'
+    # assert type(model_config['maxpool_idx']) == int and model_config['maxpool_idx'] >= 0 & model_config['maxpool_idx'] <= model_config['cnn_blocks'], 'Max pool idx must be a non-negative integer. It is intended to determine between which CNN block a maxpool layer is placed.'
     assert type(model_config['d_model']) == int and model_config['d_model'] > 0, 'Depth of the model must be a positive integer.'
     assert type(model_config['dff']) == int and model_config['dff'] > 0, 'Depth of the feed forward network must be a posotove integer.'
     assert type(model_config['num_heads']) == int and model_config['num_heads'] > 0, 'Number of attention heads must be a positive integer.'
     assert type(model_config['dropout_rate']) == float and 0 <= model_config['dropout_rate'] < 1, 'Drop out rate must be a float between 0 (included) and 1.'
-    assert type(model_config['maxpool_kernel']) == int and model_config['signal_window_size'] % model_config['maxpool_kernel'] == 0, 'Maxpool kernel size must be a positive integer and must devide window length with a remainder of 0.'
+    # assert type(model_config['maxpool_kernel']) == int and model_config['signal_window_size'] % model_config['maxpool_kernel'] == 0, 'Maxpool kernel size must be a positive integer and must devide window length with a remainder of 0.'
 
 def verify_train_config(train_config, model_config):
     assert os.path.exists(train_config['data']), 'Invalid train data directory.'

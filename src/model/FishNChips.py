@@ -4,50 +4,30 @@ import tensorflow as tf
 
 from src.model.ConvBlock import ConvolutionBlock
 from src.model.Attention.Transformer import Transformer
+from src.model.Attention.Encoder import Encoder
 
 class FishNChips(tf.keras.Model):
     def __init__(self, num_cnn_blocks, max_pool_layer_idx, max_pool_kernel_size, num_layers, d_model, output_dim, num_heads, dff, pe_encoder_max_length, pe_decoder_max_length, rate=0.1):
         super(FishNChips, self).__init__()
-        self.pe_encoder_max_length = pe_encoder_max_length
-        self.pe_decoder_max_length = pe_decoder_max_length
 
-        # cnn layer for dimensionality expansion
-        self.first_cnn = tf.keras.layers.Conv1D(d_model, 1, padding="same", activation="relu", name=f"dimensionality-cnn")
-        
-        self.max_pool_layer_idx = max_pool_layer_idx
-        self.max_pool = tf.keras.layers.MaxPooling1D(pool_size=max_pool_kernel_size, name="max_pool_1D")
-        
-        self.cnn_blocks = [ConvolutionBlock([1,3,1], d_model, i) for i in range(num_cnn_blocks)]
-        self.transformer = Transformer(num_layers=num_layers, d_model=d_model, output_dim=output_dim, num_heads=num_heads, dff=dff, pe_encoder_max_length=pe_encoder_max_length, pe_decoder_max_length=pe_decoder_max_length)
+        self.cnn_block_1 = ConvolutionBlock(filters=d_model/2, kernel=3, dropout_rate=rate, idx=1)
+        self.cnn_block_2 = ConvolutionBlock(filters=d_model, kernel=3, dropout_rate=rate, idx=2)
+        self.encoder = Encoder(num_layers, d_model, num_heads, dff, pe_encoder_max_length, rate)
+        self.linear = tf.keras.layers.Dense(output_dim)
     
     def call(self, x, training):
-        x = self.first_cnn(x) # to bring to proper dimensionality
-        x = self.call_cnn_blocks(x) # won't do anything if no cnn blocks
-        x = self.transformer(x, training)
+        x = self.cnn_block_1(x) 
+        x = self.cnn_block_2(x)
+        x = self.encoder(x, training)
+        x = self.linear(x)
+        x = tf.nn.softmax(x)
         return x
-
-    def call_cnn_blocks(self, x):
-        for i,cnn_block in enumerate(self.cnn_blocks):
-            x = cnn_block(x)
-            
-            if(i == self.max_pool_layer_idx):
-                x = self.max_pool(x)
-        return x
-
-    def get_cross_entrophy_loss(self, real, pred, loss_object):
-        mask = tf.math.logical_not(tf.math.equal(real, 0))
-        loss_ = loss_object(real, pred)
-
-        mask = tf.cast(mask, dtype=loss_.dtype)
-        loss_ *= mask
-        return tf.reduce_mean(loss_)
 
     def get_ctc_loss(self, labels, logits):       
         logit_lengths = np.array(logits.shape[0]*[logits.shape[1]])
         label_lengths = np.array(labels.shape[0]*[labels.shape[1]])
         loss = tf.nn.ctc_loss(
             labels, logits, label_lengths, logit_lengths, 
-            logits_time_major=False, unique=None,blank_index=0)
+            logits_time_major=False, unique=None)
+        loss = tf.reduce_mean(loss)
         return loss
-        
-        
