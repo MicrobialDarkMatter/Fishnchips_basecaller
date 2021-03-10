@@ -26,11 +26,10 @@ class FishNChips(tf.keras.Model):
         x = tf.nn.softmax(x)
         return x
 
-    def get_ctc_loss(self, labels, logits):       
+    def get_ctc_loss(self, labels, label_lengths, logits):       
         logit_lengths = np.array(logits.shape[0]*[logits.shape[1]])
-        label_lengths = np.array(labels.shape[0]*[labels.shape[1]])
         loss = tf.nn.ctc_loss(
             labels, logits, label_lengths, logit_lengths, 
-            logits_time_major=False, unique=None)
+            logits_time_major=False, unique=None, blank_index=5)
         loss = tf.reduce_mean(loss)
         return loss

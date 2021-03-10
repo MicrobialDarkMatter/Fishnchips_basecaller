@@ -1,7 +1,7 @@
 {
     "model": {
-        "signal_window_size": 2048,
-        "label_window_size": 300,
+        "signal_window_size": 300,
+        "label_window_size": 100,
         "attention_blocks": 6,
         "d_model": 512,
         "dff": 512,
@@ -10,26 +10,26 @@
     },
     "training": {
         "data": "./data/validation.hdf5",
-        "epochs": 1,
+        "epochs": 5,
         "warmup": 1,
         "patience": 1,
         "batches": 2,
         "batch_size": 8,
         "buffer_size": 1,
         "lr_mult": 100,
-        "signal_window_stride": 1024
+        "signal_window_stride": 300
     },
     "validation": {
         "data": "./data/validation.hdf5",
         "batch_size": 16,
         "buffer_size": 5,
         "reads": 1,
-        "signal_window_stride": 1024
+        "signal_window_stride": 300
     },
     "testing": {
         "batch_size": 300,
         "buffer_size": 5,
-        "signal_window_stride": 2048,
+        "signal_window_stride": 300,
         "save_predictions":true,
         "reads": 1,
         "bacteria": [

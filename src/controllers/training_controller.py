@@ -49,10 +49,11 @@ class TrainingController():
             self.train_loss.reset_states()
 
             batches = next(self.generator.get_batches(self.batches))
-            for batch,(x,y) in enumerate(batches):
+            for batch,(x, y, y_lens) in enumerate(batches):
                 x = tf.constant(x, dtype=tf.float32)
-                y = tf.convert_to_tensor(y, dtype=tf.int32)                
-                self.train_step(x, y)
+                y = tf.constant(y, dtype=tf.int32)
+                y_lens = tf.constant(y_lens, dtype=tf.int32)
+                self.train_step(x, y, y_lens)
                 print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} ', end="\r")
             print()
 
@@ -80,10 +81,10 @@ class TrainingController():
         return self.model
     
     @tf.function
-    def train_step(self, x, y):
+    def train_step(self, x, y, y_lens):
         with tf.GradientTape() as tape:
-            y_prediction = self.model(x, training=True)   
-            loss = self.model.get_ctc_loss(y, y_prediction)
+            logits = self.model(x, training=True)   
+            loss = self.model.get_ctc_loss(y, y_lens, logits)
 
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
@@ -91,18 +92,28 @@ class TrainingController():
 
     def print_sample_output(self):
         batches = next(self.generator.get_batches(1))
-        for batch,(x,y) in enumerate(batches):
+        for batch,(x,y,y_lens) in enumerate(batches):
             x = tf.constant(x[:1], dtype=tf.float32)
             y = tf.constant(y[:1], dtype=tf.int32)
             p = self.model(x, training=True)
-            p = tf.transpose(p, [1, 0, 2])
-            p, _ = tf.nn.ctc_greedy_decoder(p, np.array(1*[self.model.max_input_length/4]), merge_repeated=False)
-            p = p[0].values.numpy()
+
+            results = self.file_controller.load_ctc()
+            results.append(p[0])
+            self.file_controller.save_ctc(np.array(results))
+
+            p = tf.cast(tf.argmax(p, axis=-1), tf.int32)
+            p = p.numpy()[0]            
+            p[p == 0] = 5
+            p = convert_to_ctc_base_string(p)
+            
+            # p = tf.transpose(p, [1, 0, 2])
+            # p, _ = tf.nn.ctc_greedy_decoder(p, np.array(1*[self.model.max_input_length/4]), merge_repeated=False)
+            # p = p[0].values.numpy()
+            
             print(' = = Sample output:')
-            print(f' = = predicted: {convert_to_ctc_base_string(p)} | {p.shape}')
+            print(f' = = predicted: {p}')
             print(f' = = true     : {convert_to_base_string(y.numpy()[0])}')
             print(60*'-')
-
 
     def set_loss(self):
         results = np.array(self.results)

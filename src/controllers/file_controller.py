@@ -107,6 +107,16 @@ class FileController():
         training = training.tolist()
         return training    
 
+    def save_ctc(self, pred):
+        path = f'{self.path}/ctc.npy'
+        np.save(path, pred, allow_pickle=True)
+
+    def load_ctc(self):
+        path = f'{self.path}/ctc.npy'
+        if os.path.exists(path):
+            return np.load(path, allow_pickle=True).tolist()
+        return []
+
     def save_testing(self, evaluation):
         with open(self.get_testing_filepath(), 'w') as f:
             json.dump(evaluation, f, indent=4)
@@ -137,6 +147,12 @@ class FileController():
         path = self.get_testing_filepath()
         if os.path.exists(path):
             print(' ! Removing existing evaluation.')
+            os.remove(path)
+
+    def teardown_ctc(self):
+        path = f'{self.path}/ctc.npy'
+        if os.path.exists(path):
+            print(' ! Removing CTC results')
             os.remove(path)
 
     def teardown_training(self):

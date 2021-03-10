@@ -37,6 +37,7 @@ def discard_existing_training(experiment_name):
     file_controller = FileController(experiment_name)
     file_controller.teardown_training()
     file_controller.teardown_model()    
+    file_controller.teardown_ctc()
 
 def discard_existing_testing(experiment_name):
     file_controller = FileController(experiment_name)

@@ -9,11 +9,11 @@ base_map = {
 }  
 
 ctc_base_map = {
-    0: '-',
     1: 'A',
     2: 'C',
     3: 'G',
-    4: 'T'
+    4: 'T',
+    5: '-'
 }
 
 """
@@ -36,9 +36,17 @@ def convert_to_base_string(int_base_list, skip_tokens=['S', 'E', 'P']):
             base_string += str_base_token
     return base_string
 
-def convert_to_ctc_base_string(int_base_list):
+def convert_to_ctc_base_string(int_base_list, collapse=True):
     base_string = ''
     for int_base_token in int_base_list:
         str_base_token = ctc_base_map[int_base_token]
         base_string += str_base_token
+    if collapse:
+        collapsed_base_string = ''
+        current_base = ''
+        for i,base in enumerate(base_string):
+            if base in 'ACTG' and current_base != base:
+                collapsed_base_string += base
+            current_base = base
+        return collapsed_base_string
     return base_string  
