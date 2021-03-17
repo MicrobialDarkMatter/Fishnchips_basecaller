@@ -21,20 +21,20 @@ class DataGenerator():
 
     def get_batched_read(self):
         while True:
-            x, y_raw, ref, dacs, read_id = self.data_buffer.get_batched_read()
+            x, y_raw, read_id = self.data_buffer.get_batched_read()
             y = self.convert_to_target_language(y_raw)
-            yield x, y, ref, dacs, read_id
+            yield x, y, read_id
 
     def convert_to_target_language(self, y_raw):
         y = []
-        start_token = 5
-        end_token = 6
+        start_token = 6
+        end_token = 5
         for y_window in y_raw:
-            y_window = [b+1 for b in y_window] 
-            y_window.insert(0, start_token)
-            y_window.append(end_token)
+            y_window = [int(b) for b in y_window if b < 5] # Remove padding
+            y_window.insert(0, start_token) # Add start token
+            y_window.append(end_token) # Add end token
             padding_len = self.label_window_size - len(y_window)
-            y_window.extend([0]*padding_len)
+            y_window.extend([0]*padding_len) # Add padding (0s)
             y.append(y_window)
         return np.array(y)
 

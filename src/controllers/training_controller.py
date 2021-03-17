@@ -79,7 +79,7 @@ class TrainingController():
         self.model.set_weights(model_weights)
         return self.model
     
-    @tf.function
+    # @tf.function
     def train_step(self, x, y):
         y_input = y[:, :-1]
         y_label = y[:, 1:]

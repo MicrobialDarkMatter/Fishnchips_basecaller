@@ -10,14 +10,14 @@ class DataLoader():
         with h5py.File(self.data_filepath, 'r') as h5file:
             return list(h5file.keys())
 
-    def load_read(self, read_id):
+    def load_read(self, read_id, normilize=False):
         with h5py.File(self.data_filepath, 'r') as h5file:
             read = h5file[read_id]
             dac = read['Dacs'][:]
-            dac = self.normalize(dac)
-            ref = deque(read['Reference'][:])
-            rts = deque(read['Ref_to_signal'][:])
-        return dac, ref, rts
+            ref = read['Reference'][:]
+            if normilize:
+                dac = self.normalize(dac)
+        return dac, ref
 
     def normalize(self, signal):
         signal = np.array(signal)

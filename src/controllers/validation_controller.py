@@ -1,6 +1,7 @@
 import tensorflow as tf
 import editdistance
 import mappy as mp
+import traceback
 import time
 import math
 
@@ -24,7 +25,7 @@ class ValidationController():
         for r in range(self.reads):
             print(f' - - validating read {r+1}/{self.reads}', end='\r')
             try:
-                x, y_true, _, _, read_id = next(self.generator.get_batched_read())
+                x, y_true, read_id = next(self.generator.get_batched_read())
                 assert len(x) == len(y_true), f' ! validation of {read_id} has failed - number of signal & label windows varies.'
                 
                 y_pred = []

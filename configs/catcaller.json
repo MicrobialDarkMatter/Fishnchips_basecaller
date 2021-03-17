@@ -1,7 +1,7 @@
 {
     "model":{
-        "signal_window_size": 300,
-        "label_window_size": 100,
+        "signal_window_size": 2400,
+        "label_window_size": 300,
         "attention_blocks": 4,
         "cnn_blocks": 5,
         "maxpool_idx": 3,
@@ -12,18 +12,18 @@
         "maxpool_kernel": 6
     },
     "training":{
-        "data":"./data/training.hdf5",
+        "data":"./data/training_catcaller.hdf5",
         "epochs": 1000,
         "warmup":100, 
         "patience": 300,
-        "batches":3000,
+        "batches":2,
         "batch_size":32,
         "buffer_size":5,
         "lr_mult": 100,
         "signal_window_stride":100
     },
     "validation":{
-        "data":"./data/validation.hdf5",
+        "data":"./data/validation_catcaller.hdf5",
         "batch_size":300,
         "buffer_size":5,
         "reads":10,

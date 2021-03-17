@@ -14,7 +14,7 @@ class ModelController():
             max_pool_kernel_size=self.model_config['maxpool_kernel'],
             num_layers=self.model_config['attention_blocks'], 
             d_model=self.model_config['d_model'], 
-            output_dim=1 + 4 + 1 + 1, # PAD + ATCG + START + STOP
+            output_dim=1 + 4 + 1, # PAD + ATCG + START + STOP
             num_heads=self.model_config['num_heads'],
             dff=self.model_config['dff'], 
             pe_encoder_max_length=self.model_config['signal_window_size'], 
