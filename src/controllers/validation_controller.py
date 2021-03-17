@@ -47,4 +47,4 @@ class ValidationController():
                 traceback.print_exc()
                        
         print()
-        return validation_loss / performed if performed > 0 else -1
+        return validation_loss / performed if performed > 0 else 1e10

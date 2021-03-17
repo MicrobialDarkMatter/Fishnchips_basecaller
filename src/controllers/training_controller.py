@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import traceback
 import time
 import math
 import sys
@@ -45,37 +46,43 @@ class TrainingController():
         model_weights = self.model.get_weights()
 
         for epoch in range(self.epochs):
-            waited = 0 if epoch < self.warmup else waited
-            start_time = time.time()
-            self.train_loss.reset_states()
-            self.train_accuracy.reset_states()
+            try:
+                waited = 0 if epoch < self.warmup else waited
+                start_time = time.time()
+                self.train_loss.reset_states()
+                self.train_accuracy.reset_states()
 
-            batches = next(self.generator.get_batches(self.batches))
-            for batch,(x,y) in enumerate(batches):
-                x = tf.constant(x, dtype=tf.float32)
-                y = tf.constant(y, dtype=tf.int32)                
-                self.train_step(x, y)
-                print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
-            print()
+                batches = next(self.generator.get_batches(self.batches))
+                for batch,(x,y) in enumerate(batches):
+                    x = tf.constant(x, dtype=tf.float32)
+                    y = tf.constant(y, dtype=tf.int32)                
+                    self.train_step(x, y)
+                    print (f' - - Epoch:{epoch+1}/{self.epochs} | Batch:{batch+1}/{len(batches)} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f}', end="\r")
+                print()
 
-            current_validation_loss = self.validation_controller.validate(self.model)
-            lr = self.get_current_learning_rate()
-            self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
-            self.file_controller.save_training(self.results)            
-            print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
+                current_validation_loss = self.validation_controller.validate(self.model)
+                lr = self.get_current_learning_rate()
+                self.results.append([self.train_loss.result(), self.train_accuracy.result(), current_validation_loss, time.time(), lr])
+                self.file_controller.save_training(self.results)            
+                print (f' = = Epoch:{epoch+1}/{self.epochs} | Loss:{self.train_loss.result():.4f} | Accuracy:{self.train_accuracy.result():.4f} | Validation loss:{current_validation_loss} | Took:{time.time() - start_time} secs | Learning rate:{lr:.10}')
 
-            if current_validation_loss < validation_loss:
-                waited = 0
-                validation_loss = current_validation_loss
-                print(' - - Model validation accuracy improvement - saving model weights.')
-                self.file_controller.save_model(self.model)                
-                model_weights = self.model.get_weights()
-            else:
-                waited += 1
-                if waited > self.patience:
-                    print(f' - Stopping training ( out of patience - model has not improved for {self.patience} epochs.')
-                    break
-            
+                if current_validation_loss < validation_loss:
+                    waited = 0
+                    validation_loss = current_validation_loss
+                    print(' - - Model validation accuracy improvement - saving model weights.')
+                    self.file_controller.save_model(self.model)                
+                    model_weights = self.model.get_weights()
+                else:
+                    waited += 1
+                    if waited > self.patience:
+                        print(f' - Stopping training ( out of patience - model has not improved for {self.patience} epochs.')
+                        break
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
+                print(y)
+                print(y.shape)
+
         self.model.set_weights(model_weights)
         return self.model
     

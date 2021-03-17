@@ -1,6 +1,6 @@
 {
     "model":{
-        "signal_window_size": 2400,
+        "signal_window_size": 2048,
         "label_window_size": 300,
         "attention_blocks": 4,
         "cnn_blocks": 5,
@@ -9,7 +9,7 @@
         "dff": 512,
         "num_heads": 25,
         "dropout_rate": 0.1,
-        "maxpool_kernel": 6
+        "maxpool_kernel": 4
     },
     "training":{
         "data":"./data/training_catcaller.hdf5",

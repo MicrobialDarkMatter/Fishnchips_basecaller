@@ -31,6 +31,9 @@ class DataGenerator():
         end_token = 5
         for y_window in y_raw:
             y_window = [int(b) for b in y_window if b < 5] # Remove padding
+            if len(y_window) == self.label_window_size:
+                y.append(y_window)
+                continue
             y_window.insert(0, start_token) # Add start token
             y_window.append(end_token) # Add end token
             padding_len = self.label_window_size - len(y_window)
