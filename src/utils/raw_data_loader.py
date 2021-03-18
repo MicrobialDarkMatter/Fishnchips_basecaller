@@ -18,11 +18,13 @@ class RawDataLoader():
                 filenames.append(file)
         return filenames
 
-    def get_read(self):
+    def get_read(self, normilize=True):
         read_filepath = f'{self.data_directory_path}/{self.read_files[self.position]}'
         self.position += 1
-        dacs, read_id = self.load_file(read_filepath)
-        dacs = self.normilize(dacs) 
+        read = self.load_file(read_filepath)
+        dacs, read_id = self.scale(read)
+        if normilize:
+            dacs = self.normilize(dacs) 
         windows = self.segment_read(dacs)
         x = np.array(windows)
         x = np.reshape(x, (x.shape[0], x.shape[1], 1))
@@ -33,8 +35,19 @@ class RawDataLoader():
             read_ids = f5.get_read_ids()
             assert len(read_ids) == 1, f'File {filepath} contains multiple reads.'    
             for read in f5.get_reads():
-                return read.get_raw_data(), read.read_id
-    
+                channel_info = read.get_channel_info()
+                return {
+                    'read_id': read.read_id,
+                    'raw':read.get_raw_data(),
+                    'offset':channel_info['offset'],
+                    'digitisation':channel_info['digitisation'],
+                    'range':channel_info['range']
+                }
+
+    def scale(self, read):
+        dacs = read['range'] / read['digitisation'] * (read['raw'] + read['offset']) 
+        return dacs, read['read_id']
+
     def normilize(self, dacs):
         dacs = np.array(dacs)
         mean = np.mean(dacs)
