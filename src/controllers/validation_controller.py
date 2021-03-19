@@ -1,9 +1,7 @@
 import tensorflow as tf
 import editdistance
-import mappy as mp
-import traceback
+import numpy as np
 import time
-import math
 
 from src.utils.base_converter import convert_to_base_string
 from src.model.Attention.attention_utils import create_combined_mask
@@ -15,6 +13,7 @@ class ValidationController():
         self.generator = generator
 
     def validate(self, model):
+        print(' - - Validating')
         start_time = time.time()
         batches = next(self.generator.get_batches(self.batches))
         loss_list = []
@@ -23,6 +22,7 @@ class ValidationController():
             y = tf.constant(y, dtype=tf.int32) 
             loss = self.validation_step(x, y, model)
             loss_list.append(loss)
+            print(f' - - - {batch+1}/{self.batches} | val loss: {loss}', end='\r')
         return np.array(loss_list).mean()
 
     @tf.function
