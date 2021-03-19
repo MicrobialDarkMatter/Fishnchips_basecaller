@@ -27,6 +27,11 @@ class DataBuffer():
             self.position = 0
             self.set_read_ids()
 
+    def get_read_id(self):
+        read_id = self.read_ids[self.position]
+        self.set_position(increment=1)
+        return read_id
+
     def get_batch(self):
         while len(self.label_windows) < self.batch_size:
             self.fetch()
@@ -43,16 +48,23 @@ class DataBuffer():
         self.set_position(increment=1)
         return np.array(read_x), np.array(read_y), read_id
         
-    def fetch(self):        
-        skips, found = 0, 0
-        while found < self.size:
-            i = self.position + skips + found
-            read_x, read_y = self.get_segmented_read(self.read_ids[i]) 
-
+    def fetch(self):
+        for i in range(self.size):
+            read_id = self.get_read_id()
+            read_x, read_y = self.get_segmented_read(read_id)
             self.signal_windows.extend(read_x)
             self.label_windows.extend(read_y)
-            found += 1      
-        self.set_position(increment=skips + found)  
+
+    # def fetch(self):        
+    #     skips, found = 0, 0
+    #     while found < self.size:
+    #         i = self.position + skips + found
+    #         read_x, read_y = self.get_segmented_read(self.read_ids[i]) 
+
+    #         self.signal_windows.extend(read_x)
+    #         self.label_windows.extend(read_y)
+    #         found += 1      
+    #     self.set_position(increment=skips + found)  
 
     def drop(self):
         self.signal_windows = self.signal_windows[self.batch_size+1:]
