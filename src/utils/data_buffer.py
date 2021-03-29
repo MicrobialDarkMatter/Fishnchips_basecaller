@@ -82,7 +82,7 @@ class DataBuffer():
         self.signal_windows = x_shuffled.tolist()
         self.label_windows = y_shuffled.tolist()
 
-    def get_segmented_read(self, read_id):     
+    def get_segmented_read(self, read_id): 
         x, y = self.data_loader.load_read(read_id)
         x = x.reshape((x.shape[0], x.shape[1], 1))
         return (x,y)

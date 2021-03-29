@@ -3,15 +3,20 @@ from src.utils.raw_data_loader import RawDataLoader
 from src.utils.data_buffer import DataBuffer
 from src.utils.data_generator import DataGenerator
 from src.utils.raw_data_generator import RawDataGenerator
+from src.utils.test_data_loader import TestDataLoader
 
 def get_loader(config, key='training'):
     data_path = config[key]['data']
     return DataLoader(data_path)
 
-def get_raw_loader(config, data_path):
-    signal_window_size = config['model']['signal_window_size']
-    signal_window_stride = config['testing']['signal_window_stride']
-    return RawDataLoader(data_path, signal_window_size, signal_window_stride)
+# def get_raw_loader(config, data_path):
+#     signal_window_size = config['model']['signal_window_size']
+#     signal_window_stride = config['testing']['signal_window_stride']
+#     return RawDataLoader(data_path, signal_window_size, signal_window_stride)
+
+def get_raw_loader(config, path):
+    assert config['model']['signal_window_size'] == 300
+    return TestDataLoader(path)
 
 def get_buffer(config, key='training'):
     loader = get_loader(config, key)

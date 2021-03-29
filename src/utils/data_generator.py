@@ -8,9 +8,11 @@ class DataGenerator():
     def get_batches(self, amount):
         while True:
             batches = []
+            start_idx = self.data_buffer.position
             for _ in range(amount):
                 x,y = next(self.get_batch())
                 batches.append([x,y])
+            print(f' - - Fetchid reads | Start idx: {start_idx} | End idx: {self.data_buffer.position}.')
             yield batches
         
     def get_batch(self):

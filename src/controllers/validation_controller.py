@@ -9,7 +9,7 @@ from src.model.Attention.attention_utils import create_combined_mask
 class ValidationController():
     def __init__(self, config, generator):
         validation_config = config['validation']
-        self.batches = 300
+        self.batches = 100
         self.generator = generator
 
     def validate(self, model):
